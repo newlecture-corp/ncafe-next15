@@ -3,7 +3,6 @@ import "newtil-css";
 // import { initLayout } from "newtil-css";
 import "./global.css";
 import { ReactNode } from "react";
-import { SessionProvider } from "next-auth/react";
 
 // import { ReactNode, useLayoutEffect } from "react";
 
@@ -30,9 +29,7 @@ export default function RootLayout({ children }: LayoutProps) {
 					href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
 				/>
 			</head>
-			<body>
-				<SessionProvider>{children}</SessionProvider>
-			</body>
+			<body>{children}</body>
 		</html>
 	);
 }
