@@ -1,13 +1,6 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { MenuDto } from "@/application/usecases/admin/menu/dto/MenuDto";
-import { ImageDto } from "@/application/usecases/admin/menu/dto/ImageDto";
-import { fetchWithAuthClient } from "@/lib/fetchWithAuthClient";
 
 export default function MenuEditPage() {
 	return (
@@ -16,7 +9,12 @@ export default function MenuEditPage() {
 				<header className="n-list">
 					<h1 className="n-heading:5">제품관리 / 메뉴관리</h1>
 					<div className="ml:3 d:flex ai:center">
-						<Link href="../../" className="n-icon n-icon:arrow_back icon-bd:circle">뒤로</Link>
+						<Link
+							href="../../"
+							className="n-icon n-icon:arrow_back icon-bd:circle"
+						>
+							뒤로
+						</Link>
 					</div>
 				</header>
 				<section className="n-frame:1">
@@ -60,8 +58,12 @@ export default function MenuEditPage() {
 							</label>
 						</div>
 						<div className="fl-dir:row jc:end">
-							<button type="submit" className="n-btn n-btn-color:main">저장</button>
-							<Link href="../../" className="n-btn">취소</Link>
+							<button type="submit" className="n-btn n-btn-color:main">
+								저장
+							</button>
+							<Link href="../../" className="n-btn">
+								취소
+							</Link>
 						</div>
 					</form>
 				</section>

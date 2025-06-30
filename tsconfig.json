@@ -21,9 +21,8 @@
 		"paths": {
 			"@/*": ["./*"]
 		},
-		"typeRoots": ["./types", "./node_modules/@types"],
-		"types": ["next-auth"]
-		// "types": ["next-auth"],
+		"typeRoots": ["./types", "./node_modules/@types"]
+		// "types": ["next-auth"]
 		// "typeRoots": ["./types", "./node_modules/@types"]
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
