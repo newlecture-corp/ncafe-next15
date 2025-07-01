@@ -1,7 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { MenuRepository } from "../../domain/repository/MenuRepository";
+import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
-import { MenuTable } from "../../domain/entities/MenuTable";
+import { MenuTable } from "../../domain/tables/MenuTable";
+import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
 
 // 메뉴 리포지토리 구현체
 export class SbMenuRepository implements MenuRepository {
@@ -20,15 +21,67 @@ export class SbMenuRepository implements MenuRepository {
 			price: menu.price,
 			hasIce: menu.has_ice,
 			createdAt: new Date(menu.created_at),
+			isPublic: menu.is_public,
 			memberId: menu.member_id,
 			categoryId: menu.category_id,
 			updatedAt: menu.updated_at ? new Date(menu.updated_at) : null,
-		} as Menu;
+			deletedAt: menu.deleted_at ? new Date(menu.deleted_at) : null,
+			description: menu.description,
+		};
 	}
 
-	// 모든 메뉴 조회
-	async findAll(): Promise<Menu[]> {
-		const { data, error } = await this.supabase.from("menu").select();
+	// MenuSearchCriteria를 이용해서 메뉴 목록 조회
+	async findAll(criteria: MenuSearchCriteria): Promise<Menu[]> {
+		let query = this.supabase.from("menu").select();
+
+		// 공개 메뉴만 조회 (publicOnly가 true인 경우)
+		if (criteria.publicOnly) {
+			query = query.eq("is_public", true);
+		}
+
+		// 카테고리 필터링
+		if (criteria.categoryId) {
+			query = query.eq("category_id", criteria.categoryId);
+		}
+
+		// 검색어 필터링 (한글명 또는 영어명에 포함)
+		if (criteria.searchWord) {
+			query = query.or(
+				`kor_name.ilike.%${criteria.searchWord}%,eng_name.ilike.%${criteria.searchWord}%`
+			);
+		}
+
+		// 정렬 필드를 데이터베이스 컬럼명으로 매핑
+		const getSortField = (field: string): string => {
+			switch (field) {
+				case "createdAt":
+					return "created_at";
+				case "updatedAt":
+					return "updated_at";
+				case "korName":
+					return "kor_name";
+				case "engName":
+					return "eng_name";
+				case "price":
+					return "price";
+				default:
+					return "created_at"; // 기본값
+			}
+		};
+
+		// 정렬
+		if (criteria.sortField) {
+			const dbSortField = getSortField(criteria.sortField);
+			query = query.order(dbSortField, { ascending: criteria.ascending });
+		} else {
+			// 기본 정렬: 생성일 내림차순
+			query = query.order("created_at", { ascending: false });
+		}
+
+		// 페이지네이션
+		query = query.range(criteria.offset, criteria.offset + criteria.limit - 1);
+
+		const { data, error } = await query;
 		if (error) throw new Error(error.message);
 		return data.map((menu) => SbMenuRepository.mapToMenu(menu)) as Menu[];
 	}

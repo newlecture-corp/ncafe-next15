@@ -6,6 +6,7 @@ export class MenuTable {
 		public price: number,
 		public has_ice: boolean,
 		public created_at: Date,
+		public is_public: boolean,
 		public member_id: string,
 		public category_id: number,
 		public updated_at: Date | null = null,

@@ -1,8 +1,9 @@
+import { MenuSearchCriteria } from "./criteria/MenuSearchCriteria";
 import { Menu } from "../entities/Menu";
 
 export interface MenuRepository {
 	// 조회 메소드들
-	findAll(): Promise<Menu[]>;
+	findAll(criteria: MenuSearchCriteria): Promise<Menu[]>;
 	findById(id: number): Promise<Menu | null>;
 	count(): Promise<number>;
 
