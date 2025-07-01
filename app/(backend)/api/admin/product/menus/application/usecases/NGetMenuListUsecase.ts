@@ -1,11 +1,10 @@
-import { GetMenuListDto } from "../dto/GetMenuListDto";
-import { MenuRepository } from "@/app/(backend)/api/domain/repository/MenuRepository";
-import { GetMenuListUsecase } from "../port/in/GetMenuListUsecase";
+import { GetMenuListDto } from "../dtos/GetMenuListDto";
+import { MenuRepository } from "@/app/(backend)/api/domain/repositories/MenuRepository";
 import { Menu } from "@/app/(backend)/api/domain/entities/Menu";
-import { MenuDto } from "../dto/MenuDto";
+import { MenuDto } from "../dtos/MenuDto";
 
 // 관리자를 위한 메뉴 목록 조회 Usecase
-export class NGetMenuListUsecase implements GetMenuListUsecase {
+export class NGetMenuListUsecase{
 	// 의존성 주입을 위한 의존 객체
 	private repository: MenuRepository;
 

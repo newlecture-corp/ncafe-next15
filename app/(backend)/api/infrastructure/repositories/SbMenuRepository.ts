@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { MenuRepository } from "../../domain/repository/MenuRepository";
+import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
 import { MenuTable } from "../../domain/entities/MenuTable";
 
