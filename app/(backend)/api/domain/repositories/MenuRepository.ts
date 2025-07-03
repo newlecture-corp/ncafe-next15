@@ -5,7 +5,7 @@ export interface MenuRepository {
 	// 조회 메소드들
 	findAll(criteria: MenuSearchCriteria): Promise<Menu[]>;
 	findById(id: number): Promise<Menu | null>;
-	count(): Promise<number>;
+	count(criteria: MenuSearchCriteria): Promise<number>;
 
 	// 조작 메소드들
 	save(menu: Menu): Promise<Menu>;

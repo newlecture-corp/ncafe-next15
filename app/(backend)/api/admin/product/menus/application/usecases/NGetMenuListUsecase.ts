@@ -46,6 +46,7 @@ export class NGetMenuListUsecase {
 
 		// 메뉴 목록 및 전체 개수 조회
 		const menus: Menu[] = await this.repository.findAll(criteria);
+		const totalCount = await this.repository.count(criteria);
 
 		// 메뉴 목록을 DTO로 변환
 		const menuDtos: MenuDto[] = menus.map((menu) => ({
@@ -56,8 +57,8 @@ export class NGetMenuListUsecase {
 		// 메뉴 목록 DTO 생성 및 반환
 		return {
 			menus: menuDtos,
-			currentPage: 1,
-			endPage: 1,
+			currentPage: currentPage,
+			endPage: Math.ceil(totalCount / pageSize),
 		};
 	}
 }
