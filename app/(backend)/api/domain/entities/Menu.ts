@@ -6,6 +6,7 @@ export class Menu {
 		public price: number,
 		public hasIce: boolean,
 		public createdAt: Date,
+		public isPublic: boolean,
 		public memberId: string,
 		public categoryId: number,
 		public updatedAt: Date | null = null,

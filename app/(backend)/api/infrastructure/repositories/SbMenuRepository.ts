@@ -1,7 +1,21 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
-import { MenuTable } from "../../domain/entities/MenuTable";
+
+interface MenuTable {
+	id: number;
+	kor_name: string;
+	eng_name: string;
+	price: number;
+	has_ice: boolean;
+	created_at: string;
+	updated_at: string | null;
+	deleted_at: string | null;
+	member_id: string;
+	category_id: number;
+	description: string | null;
+	is_public: boolean;
+}
 
 // 메뉴 리포지토리 구현체
 export class SbMenuRepository implements MenuRepository {
@@ -13,17 +27,20 @@ export class SbMenuRepository implements MenuRepository {
 
 	// 데이터베이스 데이터를 도메인 엔티티로 변환
 	private static mapToMenu(menu: MenuTable): Menu {
-		return {
-			id: menu.id,
-			korName: menu.kor_name,
-			engName: menu.eng_name,
-			price: menu.price,
-			hasIce: menu.has_ice,
-			createdAt: new Date(menu.created_at),
-			memberId: menu.member_id,
-			categoryId: menu.category_id,
-			updatedAt: menu.updated_at ? new Date(menu.updated_at) : null,
-		} as Menu;
+		return new Menu(
+			menu.id,
+			menu.kor_name,
+			menu.eng_name,
+			menu.price,
+			menu.has_ice,
+			new Date(menu.created_at),
+			menu.is_public,
+			menu.member_id,
+			menu.category_id,
+			menu.updated_at ? new Date(menu.updated_at) : null,
+			menu.deleted_at ? new Date(menu.deleted_at) : null,
+			menu.description
+		);
 	}
 
 	// 모든 메뉴 조회
