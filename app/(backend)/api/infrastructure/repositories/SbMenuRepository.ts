@@ -126,7 +126,7 @@ export class SbMenuRepository implements MenuRepository {
 
 	// MenuSearchCriteria를 이용해서 메뉴 목록 조회
 	async findAll(criteria: MenuSearchCriteria): Promise<Menu[]> {
-		const query = this.buildMenuQuery("menu", "*", criteria);
+		const query = this.buildMenuQuery("menus", "*", criteria);
 		const { data, error } = await query;
 		if (error) throw new Error(error.message);
 
@@ -136,7 +136,7 @@ export class SbMenuRepository implements MenuRepository {
 	// 특정 메뉴 조회
 	async findById(id: number): Promise<Menu | null> {
 		const { data, error } = await this.supabase
-			.from("menu")
+			.from("menus")
 			.select()
 			.eq("id", id)
 			.single();
@@ -146,7 +146,7 @@ export class SbMenuRepository implements MenuRepository {
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)
 	async count(criteria: MenuSearchCriteria): Promise<number> {
-		const query = this.buildMenuQuery("menu", "*", criteria, {
+		const query = this.buildMenuQuery("menus", "*", criteria, {
 			skipSort: true,
 			skipPagination: true,
 			isCount: true,
@@ -159,7 +159,7 @@ export class SbMenuRepository implements MenuRepository {
 	// 메뉴 저장
 	async save(menu: Menu): Promise<Menu> {
 		const { data, error } = await this.supabase
-			.from("menu")
+			.from("menus")
 			.insert([menu])
 			.select()
 			.single();
@@ -171,7 +171,7 @@ export class SbMenuRepository implements MenuRepository {
 	async update(menu: Menu): Promise<Menu> {
 		if (!menu.id) throw new Error("Menu id is required for update");
 		const { data, error } = await this.supabase
-			.from("menu")
+			.from("menus")
 			.update(menu)
 			.eq("id", menu.id)
 			.select()
