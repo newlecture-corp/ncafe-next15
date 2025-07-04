@@ -4,6 +4,8 @@ import { Menu } from "../../domain/entities/Menu";
 import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
 import { MenuView } from "../../domain/entities/MenuView";
 
+// 여기서 정의한 인터페이스는 DB 속성명과 JS 객체 속성명을 매핑하기 위한 목적의 인터페이스이다.
+// 데이터베이스 API를 다른 것을 사용하면 매핑이 필요없을 수도 있다.
 interface MenuTable {
 	id: number;
 	kor_name: string;
@@ -17,6 +19,14 @@ interface MenuTable {
 	category_id: number;
 	description: string | null;
 	is_public: boolean;
+}
+
+interface MenuWithImagesTable extends MenuTable {
+	images: {
+		id: number;
+		name: string;
+		is_default: boolean;
+	}[];
 }
 
 // 메뉴 리포지토리 구현체
@@ -191,7 +201,7 @@ export class SbMenuRepository implements MenuRepository {
 
 	// MenuSearchCriteria를 이용해서 메뉴 목록 조회
 	async findAll(criteria: MenuSearchCriteria): Promise<Menu[]> {
-		const query = this.buildMenuQuery("menu", "*", criteria);
+		const query = this.buildMenuQuery("menus", "*", criteria);
 		const { data, error } = await query;
 		if (error) throw new Error(error.message);
 
@@ -201,41 +211,25 @@ export class SbMenuRepository implements MenuRepository {
 	}
 
 	async findViewAll(criteria: MenuSearchCriteria): Promise<MenuView[]> {
+		// 메뉴와 이미지를 함께 조회
 		const query = this.buildMenuQuery(
-			"menu",
-			"*, images:image(id,name,is_default)",
+			"menus",
+			"*, images:menu_images(id, name, is_default)",
 			criteria
 		);
 		const { data, error } = await query;
 
 		if (error) throw new Error(error.message);
-		return (
-			data as unknown as {
-				id: number;
-				kor_name: string;
-				eng_name: string;
-				price: number;
-				has_ice: boolean;
-				created_at: string;
-				updated_at: string | null;
-				deleted_at: string | null;
-				member_id: string;
-				category_id: number;
-				description: string | null;
-				is_public: boolean;
-				images: {
-					id: number;
-					name: string;
-					is_default: boolean;
-				}[];
-			}[]
-		).map((menu) => SbMenuRepository.mapToMenuView(menu));
+
+		return (data as unknown as MenuWithImagesTable[]).map((menu) =>
+			SbMenuRepository.mapToMenuView(menu)
+		);
 	}
 
 	// 특정 메뉴 조회
 	async findById(id: number): Promise<Menu | null> {
 		const { data, error } = await this.supabase
-			.from("menu")
+			.from("menus")
 			.select()
 			.eq("id", id)
 			.single();
@@ -245,7 +239,7 @@ export class SbMenuRepository implements MenuRepository {
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)
 	async count(criteria: MenuSearchCriteria): Promise<number> {
-		const query = this.buildMenuQuery("menu", "*", criteria, {
+		const query = this.buildMenuQuery("menus", "*", criteria, {
 			skipSort: true,
 			skipPagination: true,
 			isCount: true,
@@ -258,7 +252,7 @@ export class SbMenuRepository implements MenuRepository {
 	// 메뉴 저장
 	async save(menu: Menu): Promise<Menu> {
 		const { data, error } = await this.supabase
-			.from("menu")
+			.from("menus")
 			.insert([menu])
 			.select()
 			.single();
@@ -270,7 +264,7 @@ export class SbMenuRepository implements MenuRepository {
 	async update(menu: Menu): Promise<Menu> {
 		if (!menu.id) throw new Error("Menu id is required for update");
 		const { data, error } = await this.supabase
-			.from("menu")
+			.from("menus")
 			.update(menu)
 			.eq("id", menu.id)
 			.select()
