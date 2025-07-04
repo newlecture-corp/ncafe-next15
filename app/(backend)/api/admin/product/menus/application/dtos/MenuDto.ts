@@ -11,6 +11,9 @@ export class MenuDto {
 		public categoryId: number,
 		public updatedAt: Date | null = null,
 		public deletedAt: Date | null = null,
-		public description: string | null = null
+		public description: string | null = null,
+
+		// 메뉴 기본 이미지 파일명
+		public defaultImage: string | null = null
 	) {}
 }

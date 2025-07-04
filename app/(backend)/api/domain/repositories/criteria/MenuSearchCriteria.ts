@@ -1,7 +1,7 @@
 export class MenuSearchCriteria {
 	constructor(
 		public searchWord?: string,
-		public categoryId?: string,
+		public categoryId?: number,
 		public memberId?: string,
 		public sortField: string = "createdAt", // 정렬 필드(createdAt, name 등)
 		public ascending: boolean = false,

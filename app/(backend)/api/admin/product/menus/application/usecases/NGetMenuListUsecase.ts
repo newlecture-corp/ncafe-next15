@@ -1,13 +1,12 @@
 import { GetMenuListDto } from "../dtos/GetMenuListDto";
 import { MenuRepository } from "@/app/(backend)/api/domain/repositories/MenuRepository";
-import { GetMenuListUsecase } from "../ports/in/GetMenuListUsecase";
-import { Menu } from "@/app/(backend)/api/domain/entities/Menu";
 import { MenuDto } from "../dtos/MenuDto";
 import { GetMenuListQueryDto } from "../dtos/GetMenuListQueryDto";
 import { MenuSearchCriteria } from "@/app/(backend)/api/domain/repositories/criteria/MenuSearchCriteria";
+import { MenuView } from "@/app/(backend)/api/domain/entities/MenuView";
 
 // 관리자를 위한 메뉴 목록 조회 Usecase
-export class NGetMenuListUsecase implements GetMenuListUsecase {
+export class NGetMenuListUsecase {
 	// 의존성 주입을 위한 의존 객체
 	private repository: MenuRepository;
 
@@ -34,7 +33,7 @@ export class NGetMenuListUsecase implements GetMenuListUsecase {
 			// - 데이터 쿼리를 위한 Criteria 객체
 			criteria = new MenuSearchCriteria(
 				queryDto.searchName || undefined,
-				queryDto.categoryId || undefined,
+				queryDto.categoryId ? Number(queryDto.categoryId) : undefined,
 				undefined, // memberId는 관리자용이므로 undefined
 				queryDto.sortField || "createdAt",
 				queryDto.ascending ?? false,
@@ -45,19 +44,42 @@ export class NGetMenuListUsecase implements GetMenuListUsecase {
 		}
 
 		// 메뉴 목록 및 전체 개수 조회
-		const menus: Menu[] = await this.repository.findAll(criteria);
+		const menuViews: MenuView[] = await this.repository.findViewAll(criteria);
+		const menuCount: number = await this.repository.count(criteria);
+
+		console.log("============== menuCount : ", menuCount);
+		console.log("============== menuViews.length : ", menuViews.length);
+		console.log("============== pageSize : ", pageSize);
+		console.log(
+			"============== endPage 계산 : ",
+			Math.ceil(menuCount / pageSize)
+		);
 
 		// 메뉴 목록을 DTO로 변환
-		const menuDtos: MenuDto[] = menus.map((menu) => ({
-			...menu,
-			defaultImage: "americano.png",
-		}));
+		const menuDtos: MenuDto[] = menuViews.map(
+			(m) =>
+				new MenuDto(
+					m.id,
+					m.korName,
+					m.engName,
+					m.price,
+					m.hasIce,
+					m.createdAt,
+					m.isPublic,
+					m.memberId,
+					m.categoryId,
+					m.updatedAt,
+					m.deletedAt,
+					m.description,
+					m.defaultImage
+				)
+		);
 
 		// 메뉴 목록 DTO 생성 및 반환
 		return {
 			menus: menuDtos,
-			currentPage: 1,
-			endPage: 1,
+			currentPage: currentPage,
+			endPage: Math.ceil(menuCount / pageSize),
 		};
 	}
 }
