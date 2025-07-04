@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { NGetMenuListUsecase } from "../application/usecases/NGetMenuListUsecase";
-import { SbMenuRepository } from "@/app/(backend)/api/infrastructure/repositories/SbMenuRepository";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { GetMenuListQueryDto } from "../application/dtos/GetMenuListQueryDto";
+import { SbMenuRepository } from "@/backend/infrastructure/repositories/SbMenuRepository";
+import { GetMenuListQueryDto } from "@/backend/application/admin/product/menus/dtos/GetMenuListQueryDto";
+import { NGetMenuListUsecase } from "@/backend/application/admin/product/menus/usecases/NGetMenuListUsecase";
 
 // 관리자를 위한 메뉴 목록 조회 API
 // GET /api/admin/product/menus

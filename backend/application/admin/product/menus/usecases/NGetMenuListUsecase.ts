@@ -1,9 +1,9 @@
 import { GetMenuListDto } from "../dtos/GetMenuListDto";
-import { MenuRepository } from "@/app/(backend)/api/domain/repositories/MenuRepository";
 import { MenuDto } from "../dtos/MenuDto";
 import { GetMenuListQueryDto } from "../dtos/GetMenuListQueryDto";
-import { MenuSearchCriteria } from "@/app/(backend)/api/domain/repositories/criteria/MenuSearchCriteria";
-import { MenuView } from "@/app/(backend)/api/domain/entities/MenuView";
+import { MenuSearchCriteria } from "@/backend/domain/repositories/criteria/MenuSearchCriteria";
+import { MenuRepository } from "@/backend/domain/repositories/MenuRepository";
+import { MenuView } from "@/backend/domain/entities/MenuView";
 
 // 관리자를 위한 메뉴 목록 조회 Usecase
 export class NGetMenuListUsecase {
