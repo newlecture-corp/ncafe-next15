@@ -17,8 +17,10 @@ export async function GET(
 			return NextResponse.json({ error: "Invalid menu ID" }, { status: 400 });
 		}
 
-		// MenuView를 사용하여 이미지 정보가 포함된 메뉴 데이터 조회
-		const menuWithImage = await menuRepository.findByIdWithImages(menuId);
+		// 이미지 정보가 포함된 메뉴 데이터 조회
+		const menuWithImage = await menuRepository.findById(menuId, {
+			includeImages: true,
+		});
 
 		console.log(menuWithImage);
 
