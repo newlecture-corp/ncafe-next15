@@ -4,13 +4,14 @@ import { SbMenuRepository } from "@/backend/infrastructure/repositories/SbMenuRe
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const supabase = await createClient();
 		const menuRepository = new SbMenuRepository(supabase);
 
-		const menuId = parseInt(params.id);
+		const resolvedParams = await params;
+		const menuId = parseInt(resolvedParams.id);
 		if (isNaN(menuId)) {
 			return NextResponse.json({ error: "Invalid menu ID" }, { status: 400 });
 		}
