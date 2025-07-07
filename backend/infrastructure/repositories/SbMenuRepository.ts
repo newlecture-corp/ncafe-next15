@@ -154,13 +154,16 @@ export class SbMenuRepository implements MenuRepository {
 	}
 
 	// MenuSearchCriteria를 이용해서 메뉴 목록 조회
-	async findAll(criteria: MenuSearchCriteria): Promise<Menu[]> {
+	async findAll(
+		criteria: MenuSearchCriteria,
+		relations?: MenuRelationsOptions
+	): Promise<Menu[]> {
 		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
 		const selectArr = ["*"];
-		if (criteria.relations?.includeImages) {
+		if (relations?.includeImages) {
 			selectArr.push("images:menu_images(id,name,is_default)");
 		}
-		if (criteria.relations?.includeMember) {
+		if (relations?.includeMember) {
 			selectArr.push("member:members(id,name,email)");
 		}
 		const selectStr = selectArr.join(", ");
