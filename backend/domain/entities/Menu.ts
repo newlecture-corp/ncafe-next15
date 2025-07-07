@@ -1,3 +1,5 @@
+import { MenuImage } from "./MenuImage";
+
 export class Menu {
 	constructor(
 		public id: number,
@@ -11,6 +13,9 @@ export class Menu {
 		public categoryId: number,
 		public updatedAt: Date | null = null,
 		public deletedAt: Date | null = null,
-		public description: string | null = null
+		public description: string | null = null,
+
+		// 자식 테이블 조인을 위한 속성
+		public images: MenuImage[] = []
 	) {}
 }

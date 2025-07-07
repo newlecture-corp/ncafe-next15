@@ -3,6 +3,8 @@ import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
 import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
 import { MenuView } from "../../domain/entities/MenuView";
+import { MenuImage } from "../../domain/entities/MenuImage";
+import { MenuMapper } from "../mappers/MenuMapper";
 
 interface MenuTable {
 	id: number;
@@ -19,6 +21,16 @@ interface MenuTable {
 	is_public: boolean;
 }
 
+interface MenuImageTable {
+	id: number;
+	name: string;
+	is_default: boolean;
+}
+
+interface MenuWithImagesTable extends MenuTable {
+	images: MenuImageTable[];
+}
+
 // 메뉴 리포지토리 구현체
 export class SbMenuRepository implements MenuRepository {
 	private supabase;
@@ -27,86 +39,21 @@ export class SbMenuRepository implements MenuRepository {
 		this.supabase = supabase;
 	}
 
-	// 데이터베이스 데이터를 도메인 엔티티로 변환
-	private static mapToMenu(menu: {
-		id: number;
-		kor_name: string;
-		eng_name: string;
-		price: number;
-		has_ice: boolean;
-		created_at: string;
-		updated_at: string | null;
-		deleted_at: string | null;
-		member_id: string;
-		category_id: number;
-		description: string | null;
-		is_public: boolean;
-	}): Menu {
-		return new Menu(
-			menu.id,
-			menu.kor_name,
-			menu.eng_name,
-			menu.price,
-			menu.has_ice,
-			new Date(menu.created_at),
-			menu.is_public,
-			menu.member_id,
-			menu.category_id,
-			menu.updated_at ? new Date(menu.updated_at) : null,
-			menu.deleted_at ? new Date(menu.deleted_at) : null,
-			menu.description
-		);
-		// (생각해볼 문제) 다음 방법과 동일한가? 왜 이렇게 작성하지 않았을까?
-		// return {
-		// 	id: menu.id,
-		// 	korName: menu.kor_name,
-		// 	engName: menu.eng_name,
-		// 	price: menu.price,
-		// 	hasIce: menu.has_ice,
-		// 	createdAt: new Date(menu.created_at),
-		// 	isPublic: menu.is_public,
-		// 	memberId: menu.member_id,
-		// 	categoryId: menu.category_id,
-		// 	updatedAt: menu.updated_at ? new Date(menu.updated_at) : null,
-		// 	deletedAt: menu.deleted_at ? new Date(menu.deleted_at) : null,
-		// 	description: menu.description,
-		// };
+	// 데이터베이스 데이터를 도메인 엔티티로 변환 (MenuMapper 사용)
+	private static mapToMenu(menu: MenuTable): Menu {
+		return MenuMapper.toMenu(menu);
 	}
 
-	private static mapToMenuView(menu: {
-		id: number;
-		kor_name: string;
-		eng_name: string;
-		price: number;
-		has_ice: boolean;
-		created_at: string;
-		updated_at: string | null;
-		deleted_at: string | null;
-		member_id: string;
-		category_id: number;
-		description: string | null;
-		is_public: boolean;
-		images: {
-			id: number;
-			name: string;
-			is_default: boolean;
-		}[];
-	}): MenuView {
-		return new MenuView(
-			menu.id,
-			menu.kor_name,
-			menu.eng_name,
-			menu.price,
-			menu.has_ice,
-			new Date(menu.created_at),
-			menu.is_public,
-			menu.member_id,
-			menu.category_id,
-			menu.updated_at ? new Date(menu.updated_at) : null,
-			menu.deleted_at ? new Date(menu.deleted_at) : null,
-			menu.description,
-			menu.images.find((image) => image.is_default)?.name ?? null
-		);
+	private static mapToMenuView(
+		menu: MenuTable & {
+			images: {
+				id: number;
+				name: string;
+				is_default: boolean;
+			}[];
+		}
+	): MenuView {
+		return MenuMapper.toMenuView(menu);
 	}
 
 	/*
@@ -209,27 +156,7 @@ export class SbMenuRepository implements MenuRepository {
 		const { data, error } = await query;
 
 		if (error) throw new Error(error.message);
-		return (
-			data as unknown as {
-				id: number;
-				kor_name: string;
-				eng_name: string;
-				price: number;
-				has_ice: boolean;
-				created_at: string;
-				updated_at: string | null;
-				deleted_at: string | null;
-				member_id: string;
-				category_id: number;
-				description: string | null;
-				is_public: boolean;
-				images: {
-					id: number;
-					name: string;
-					is_default: boolean;
-				}[];
-			}[]
-		).map((menu) => SbMenuRepository.mapToMenuView(menu));
+		return MenuMapper.toMenuViewArray(data as unknown as MenuWithImagesTable[]);
 	}
 
 	// 특정 메뉴 조회
@@ -241,6 +168,43 @@ export class SbMenuRepository implements MenuRepository {
 			.single();
 		if (error) throw new Error(error.message);
 		return SbMenuRepository.mapToMenu(data);
+	}
+
+	// 특정 메뉴 조회 (이미지 포함)
+	async findByIdWithImages(id: number): Promise<Menu | null> {
+		const { data, error } = await this.supabase
+			.from("menus")
+			.select("*, images:menu_images(id,name,is_default)")
+			.eq("id", id)
+			.single();
+
+		if (error) throw new Error(error.message);
+
+		const menu = SbMenuRepository.mapToMenu(data);
+		const images = data.images.map((image: MenuImageTable) => ({
+			id: image.id,
+			name: image.name,
+			is_default: image.is_default,
+		}));
+		const menuWithImages = {
+			...menu,
+			images,
+		};
+
+		return menuWithImages;
+	}
+
+	// 특정 메뉴 조회 (이미지 배열 포함)
+	async findByIdWithImageArray(
+		id: number
+	): Promise<(Menu & { images: MenuImage[] }) | null> {
+		const { data, error } = await this.supabase
+			.from("menus")
+			.select("*, images:menu_images(id,name,is_default,menu_id)")
+			.eq("id", id)
+			.single();
+		if (error) throw new Error(error.message);
+		return MenuMapper.toMenuWithImages(data);
 	}
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)
