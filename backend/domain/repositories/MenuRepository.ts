@@ -1,6 +1,6 @@
 import { MenuSearchCriteria } from "./criteria/MenuSearchCriteria";
 import { Menu } from "../entities/Menu";
-import { MenuRelationsOptions } from "./criteria/MenuSearchCriteria";
+import { MenuRelationsOptions } from "./options/MenuRelationsOptions";
 
 export interface MenuRepository {
 	// 조회 메소드들

@@ -1,11 +1,9 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
-import {
-	MenuSearchCriteria,
-	MenuRelationsOptions,
-} from "../../domain/repositories/criteria/MenuSearchCriteria";
-import { MenuImage } from "../../domain/entities/MenuImage";
+import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
+import { MenuRelationsOptions } from "../../domain/repositories/options/MenuRelationsOptions";
+import { MenuMapper } from "../mappers/MenuMapper";
 
 interface MenuTable {
 	id: number;
@@ -28,49 +26,6 @@ export class SbMenuRepository implements MenuRepository {
 
 	constructor(supabase: SupabaseClient) {
 		this.supabase = supabase;
-	}
-
-	// 데이터베이스 데이터를 도메인 엔티티로 변환
-	private static mapToMenu(menu: {
-		id: number;
-		kor_name: string;
-		eng_name: string;
-		price: number;
-		has_ice: boolean;
-		created_at: string;
-		updated_at: string | null;
-		deleted_at: string | null;
-		member_id: string;
-		category_id: number;
-		description: string | null;
-		is_public: boolean;
-		images?: {
-			id: number;
-			name: string;
-			is_default: boolean;
-		}[];
-	}): Menu {
-		const menuImages =
-			menu.images?.map(
-				(image) =>
-					new MenuImage(image.id, image.name, image.is_default, menu.id)
-			) || [];
-
-		return new Menu(
-			menu.id,
-			menu.kor_name,
-			menu.eng_name,
-			menu.price,
-			menu.has_ice,
-			new Date(menu.created_at),
-			menu.is_public,
-			menu.member_id,
-			menu.category_id,
-			menu.updated_at ? new Date(menu.updated_at) : null,
-			menu.deleted_at ? new Date(menu.deleted_at) : null,
-			menu.description,
-			menuImages
-		);
 	}
 
 	/*
@@ -161,10 +116,10 @@ export class SbMenuRepository implements MenuRepository {
 		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
 		const selectArr = ["*"];
 		if (relations?.includeImages) {
-			selectArr.push("images:menu_images(id,name,is_default)");
+			selectArr.push("images:menu_images(*)");
 		}
 		if (relations?.includeMember) {
-			selectArr.push("member:members(id,name,email)");
+			selectArr.push("member:members(*)");
 		}
 		const selectStr = selectArr.join(", ");
 
@@ -172,9 +127,7 @@ export class SbMenuRepository implements MenuRepository {
 		const { data, error } = await query;
 		if (error) throw new Error(error.message);
 
-		return (data as unknown as MenuTable[]).map(
-			SbMenuRepository.mapToMenu
-		) as Menu[];
+		return MenuMapper.toMenuArray(data as unknown as MenuTable[]);
 	}
 
 	// 특정 메뉴 조회
@@ -185,10 +138,10 @@ export class SbMenuRepository implements MenuRepository {
 		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
 		const selectArr = ["*"];
 		if (relations?.includeImages) {
-			selectArr.push("images:menu_images(id,name,is_default)");
+			selectArr.push("images:menu_images(*)");
 		}
 		if (relations?.includeMember) {
-			selectArr.push("member:members(id,name,email)");
+			selectArr.push("member:members(*)");
 		}
 		const selectStr = selectArr.join(", ");
 
@@ -199,7 +152,7 @@ export class SbMenuRepository implements MenuRepository {
 			.single();
 		if (error) throw new Error(error.message);
 		if (!data) return null;
-		return SbMenuRepository.mapToMenu(data as unknown as MenuTable);
+		return MenuMapper.toMenu(data as unknown as MenuTable);
 	}
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)

@@ -1,7 +1,5 @@
 import { Menu } from "../../domain/entities/Menu";
-import { MenuView } from "../../domain/entities/MenuView";
 import { MenuImage } from "../../domain/entities/MenuImage";
-import { MenuImageMapper } from "./MenuImageMapper";
 
 /**
  * 메뉴 데이터베이스 테이블과 도메인 엔티티 간의 매핑
@@ -23,7 +21,19 @@ export class MenuMapper {
 		category_id: number;
 		description: string | null;
 		is_public: boolean;
+		images?: {
+			id: number;
+			name: string;
+			is_default: boolean;
+			menu_id: number;
+		}[];
 	}): Menu {
+		const menuImages =
+			dbMenu.images?.map(
+				(image) =>
+					new MenuImage(image.id, image.name, image.is_default, image.menu_id)
+			) || [];
+
 		return new Menu(
 			dbMenu.id,
 			dbMenu.kor_name,
@@ -36,46 +46,8 @@ export class MenuMapper {
 			dbMenu.category_id,
 			dbMenu.updated_at ? new Date(dbMenu.updated_at) : null,
 			dbMenu.deleted_at ? new Date(dbMenu.deleted_at) : null,
-			dbMenu.description
-		);
-	}
-
-	/**
-	 * 데이터베이스 결과를 MenuView 엔티티로 변환 (이미지 포함)
-	 */
-	static toMenuView(dbMenu: {
-		id: number;
-		kor_name: string;
-		eng_name: string;
-		price: number;
-		has_ice: boolean;
-		created_at: string;
-		updated_at: string | null;
-		deleted_at: string | null;
-		member_id: string;
-		category_id: number;
-		description: string | null;
-		is_public: boolean;
-		images: {
-			id: number;
-			name: string;
-			is_default: boolean;
-		}[];
-	}): MenuView {
-		return new MenuView(
-			dbMenu.id,
-			dbMenu.kor_name,
-			dbMenu.eng_name,
-			dbMenu.price,
-			dbMenu.has_ice,
-			new Date(dbMenu.created_at),
-			dbMenu.is_public,
-			dbMenu.member_id,
-			dbMenu.category_id,
-			dbMenu.updated_at ? new Date(dbMenu.updated_at) : null,
-			dbMenu.deleted_at ? new Date(dbMenu.deleted_at) : null,
 			dbMenu.description,
-			dbMenu.images.find((image) => image.is_default)?.name ?? null
+			menuImages
 		);
 	}
 
@@ -113,41 +85,9 @@ export class MenuMapper {
 	}
 
 	/**
-	 * 데이터베이스 결과를 MenuView 엔티티로 변환 (이미지 배열 포함)
+	 * 데이터베이스 결과 배열을 Menu 엔티티 배열로 변환
 	 */
-	static toMenuWithImages(dbMenu: {
-		id: number;
-		kor_name: string;
-		eng_name: string;
-		price: number;
-		has_ice: boolean;
-		created_at: string;
-		updated_at: string | null;
-		deleted_at: string | null;
-		member_id: string;
-		category_id: number;
-		description: string | null;
-		is_public: boolean;
-		images: {
-			id: number;
-			name: string;
-			is_default: boolean;
-			menu_id: number;
-		}[];
-	}): Menu & { images: MenuImage[] } {
-		const menu = this.toMenu(dbMenu);
-		const images = MenuImageMapper.toMenuImageArray(dbMenu.images);
-
-		return {
-			...menu,
-			images,
-		};
-	}
-
-	/**
-	 * 데이터베이스 결과 배열을 MenuView 엔티티 배열로 변환
-	 */
-	static toMenuViewArray(
+	static toMenuArray(
 		dbMenus: {
 			id: number;
 			kor_name: string;
@@ -161,13 +101,16 @@ export class MenuMapper {
 			category_id: number;
 			description: string | null;
 			is_public: boolean;
-			images: {
+			images?: {
 				id: number;
 				name: string;
 				is_default: boolean;
+				menu_id: number;
+				created_at?: string;
+				updated_at?: string | null;
 			}[];
 		}[]
-	): MenuView[] {
-		return dbMenus.map((menu) => this.toMenuView(menu));
+	): Menu[] {
+		return dbMenus.map((menu) => this.toMenu(menu));
 	}
 }

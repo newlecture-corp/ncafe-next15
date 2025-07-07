@@ -1,8 +1,3 @@
-export interface MenuRelationsOptions {
-	includeImages?: boolean;
-	includeMember?: boolean;
-}
-
 export class MenuSearchCriteria {
 	constructor(
 		public searchWord?: string,
