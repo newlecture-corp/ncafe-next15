@@ -2,7 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
 import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
-import { MenuView } from "../../domain/entities/MenuView";
+import { MenuImage } from "../../domain/entities/MenuImage";
 
 interface MenuTable {
 	id: number;
@@ -41,7 +41,18 @@ export class SbMenuRepository implements MenuRepository {
 		category_id: number;
 		description: string | null;
 		is_public: boolean;
+		images?: {
+			id: number;
+			name: string;
+			is_default: boolean;
+		}[];
 	}): Menu {
+		const menuImages =
+			menu.images?.map(
+				(image) =>
+					new MenuImage(image.id, image.name, image.is_default, menu.id)
+			) || [];
+
 		return new Menu(
 			menu.id,
 			menu.kor_name,
@@ -54,58 +65,8 @@ export class SbMenuRepository implements MenuRepository {
 			menu.category_id,
 			menu.updated_at ? new Date(menu.updated_at) : null,
 			menu.deleted_at ? new Date(menu.deleted_at) : null,
-			menu.description
-		);
-		// (생각해볼 문제) 다음 방법과 동일한가? 왜 이렇게 작성하지 않았을까?
-		// return {
-		// 	id: menu.id,
-		// 	korName: menu.kor_name,
-		// 	engName: menu.eng_name,
-		// 	price: menu.price,
-		// 	hasIce: menu.has_ice,
-		// 	createdAt: new Date(menu.created_at),
-		// 	isPublic: menu.is_public,
-		// 	memberId: menu.member_id,
-		// 	categoryId: menu.category_id,
-		// 	updatedAt: menu.updated_at ? new Date(menu.updated_at) : null,
-		// 	deletedAt: menu.deleted_at ? new Date(menu.deleted_at) : null,
-		// 	description: menu.description,
-		// };
-	}
-
-	private static mapToMenuView(menu: {
-		id: number;
-		kor_name: string;
-		eng_name: string;
-		price: number;
-		has_ice: boolean;
-		created_at: string;
-		updated_at: string | null;
-		deleted_at: string | null;
-		member_id: string;
-		category_id: number;
-		description: string | null;
-		is_public: boolean;
-		images: {
-			id: number;
-			name: string;
-			is_default: boolean;
-		}[];
-	}): MenuView {
-		return new MenuView(
-			menu.id,
-			menu.kor_name,
-			menu.eng_name,
-			menu.price,
-			menu.has_ice,
-			new Date(menu.created_at),
-			menu.is_public,
-			menu.member_id,
-			menu.category_id,
-			menu.updated_at ? new Date(menu.updated_at) : null,
-			menu.deleted_at ? new Date(menu.deleted_at) : null,
 			menu.description,
-			menu.images.find((image) => image.is_default)?.name ?? null
+			menuImages
 		);
 	}
 
@@ -191,45 +152,23 @@ export class SbMenuRepository implements MenuRepository {
 
 	// MenuSearchCriteria를 이용해서 메뉴 목록 조회
 	async findAll(criteria: MenuSearchCriteria): Promise<Menu[]> {
-		const query = this.buildMenuQuery("menus", "*", criteria);
+		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
+		const selectArr = ["*"];
+		if (criteria.relations?.includeImages) {
+			selectArr.push("images:menu_images(id,name,is_default)");
+		}
+		if (criteria.relations?.includeMember) {
+			selectArr.push("member:members(id,name,email)");
+		}
+		const selectStr = selectArr.join(", ");
+
+		const query = this.buildMenuQuery("menus", selectStr, criteria);
 		const { data, error } = await query;
 		if (error) throw new Error(error.message);
 
 		return (data as unknown as MenuTable[]).map(
 			SbMenuRepository.mapToMenu
 		) as Menu[];
-	}
-
-	async findViewAll(criteria: MenuSearchCriteria): Promise<MenuView[]> {
-		const query = this.buildMenuQuery(
-			"menus",
-			"*, images:menu_images(id,name,is_default)",
-			criteria
-		);
-		const { data, error } = await query;
-
-		if (error) throw new Error(error.message);
-		return (
-			data as unknown as {
-				id: number;
-				kor_name: string;
-				eng_name: string;
-				price: number;
-				has_ice: boolean;
-				created_at: string;
-				updated_at: string | null;
-				deleted_at: string | null;
-				member_id: string;
-				category_id: number;
-				description: string | null;
-				is_public: boolean;
-				images: {
-					id: number;
-					name: string;
-					is_default: boolean;
-				}[];
-			}[]
-		).map((menu) => SbMenuRepository.mapToMenuView(menu));
 	}
 
 	// 특정 메뉴 조회

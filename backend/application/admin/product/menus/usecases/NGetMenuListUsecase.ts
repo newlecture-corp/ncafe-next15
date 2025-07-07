@@ -3,7 +3,6 @@ import { MenuDto } from "../dtos/MenuDto";
 import { GetMenuListQueryDto } from "../dtos/GetMenuListQueryDto";
 import { MenuSearchCriteria } from "@/backend/domain/repositories/criteria/MenuSearchCriteria";
 import { MenuRepository } from "@/backend/domain/repositories/MenuRepository";
-import { MenuView } from "@/backend/domain/entities/MenuView";
 
 // 관리자를 위한 메뉴 목록 조회 Usecase
 export class NGetMenuListUsecase {
@@ -39,16 +38,17 @@ export class NGetMenuListUsecase {
 				queryDto.ascending ?? false,
 				!(queryDto.includeAll ?? false), // includeAll이 true면 publicOnly를 false로 설정 (모든 메뉴 조회)
 				offset,
-				limit
+				limit,
+				{ includeImages: true } // images만 포함, member는 필요시 true로
 			);
 		}
 
 		// 메뉴 목록 및 전체 개수 조회
-		const menuViews: MenuView[] = await this.repository.findViewAll(criteria);
+		const menus = await this.repository.findAll(criteria);
 		const menuCount: number = await this.repository.count(criteria);
 
 		console.log("============== menuCount : ", menuCount);
-		console.log("============== menuViews.length : ", menuViews.length);
+		console.log("============== menus.length : ", menus.length);
 		console.log("============== pageSize : ", pageSize);
 		console.log(
 			"============== endPage 계산 : ",
@@ -56,7 +56,7 @@ export class NGetMenuListUsecase {
 		);
 
 		// 메뉴 목록을 DTO로 변환
-		const menuDtos: MenuDto[] = menuViews.map(
+		const menuDtos: MenuDto[] = menus.map(
 			(m) =>
 				new MenuDto(
 					m.id,
@@ -71,7 +71,7 @@ export class NGetMenuListUsecase {
 					m.updatedAt,
 					m.deletedAt,
 					m.description,
-					m.defaultImage
+					m.menuImages.find((image) => image.isDefault)?.name ?? null
 				)
 		);
 
