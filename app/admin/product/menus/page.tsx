@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import RowEx from "./components/RowEx";
+import RowDetails from "./components/RowDetails";
 import SearchForm from "./components/SearchForm";
 
 export default function MenuListPage() {
@@ -82,7 +82,7 @@ export default function MenuListPage() {
 										</span>
 									</td>
 								</tr>
-								<RowEx />
+								<RowDetails />
 								<tr className="vertical-align:middle">
 									<td>2</td>
 									<td className="w:0 md:w:2 overflow:hidden">
@@ -118,7 +118,7 @@ export default function MenuListPage() {
 										</span>
 									</td>
 								</tr>
-								<RowEx />
+								<RowDetails />
 							</tbody>
 						</table>
 					</div>
