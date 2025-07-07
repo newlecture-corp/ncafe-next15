@@ -1,7 +1,10 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
-import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
+import {
+	MenuSearchCriteria,
+	MenuRelationsOptions,
+} from "../../domain/repositories/criteria/MenuSearchCriteria";
 import { MenuImage } from "../../domain/entities/MenuImage";
 
 interface MenuTable {
@@ -71,7 +74,7 @@ export class SbMenuRepository implements MenuRepository {
 	}
 
 	/*
-	findAll, findViewAll, count 메서드에서 공통으로 사용하는 필터링, 정렬, 검색 필드 매핑 코드를 집중화한 메서드
+	findAll, count 메서드에서 공통으로 사용하는 필터링, 정렬, 검색 필드 매핑 코드를 집중화한 메서드
 	*/
 	private buildMenuQuery(
 		base: string,
@@ -172,14 +175,28 @@ export class SbMenuRepository implements MenuRepository {
 	}
 
 	// 특정 메뉴 조회
-	async findById(id: number): Promise<Menu | null> {
+	async findById(
+		id: number,
+		relations?: MenuRelationsOptions
+	): Promise<Menu | null> {
+		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
+		const selectArr = ["*"];
+		if (relations?.includeImages) {
+			selectArr.push("images:menu_images(id,name,is_default)");
+		}
+		if (relations?.includeMember) {
+			selectArr.push("member:members(id,name,email)");
+		}
+		const selectStr = selectArr.join(", ");
+
 		const { data, error } = await this.supabase
 			.from("menus")
-			.select()
+			.select(selectStr)
 			.eq("id", id)
 			.single();
 		if (error) throw new Error(error.message);
-		return SbMenuRepository.mapToMenu(data);
+		if (!data) return null;
+		return SbMenuRepository.mapToMenu(data as unknown as MenuTable);
 	}
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)

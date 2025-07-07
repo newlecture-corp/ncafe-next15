@@ -3,8 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import RowDetails from "./components/RowDetails";
 import SearchForm from "./components/SearchForm";
+import RowDetails from "./components/RowDetails";
 
 export default function MenuListPage() {
 	return (

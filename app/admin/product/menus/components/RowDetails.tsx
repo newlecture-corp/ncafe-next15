@@ -1,15 +1,17 @@
 "use client";
 
+"use client";
+
 import React from "react";
 import Image from "next/image";
 
 const RowDetails: React.FC = () => {
 	return (
-		<tr>
+		<tr className="bg-color:base-4a">
 			<td colSpan={5}>
 				<section>
 					<h1 className="d:none">상세내용</h1>
-					<dl className="n-list:dash-lined">
+					<dl className="n-list:definition-list-ruled">
 						<div>
 							<dt>영문명</dt>
 							<dd className="ml:1">Americano</dd>
