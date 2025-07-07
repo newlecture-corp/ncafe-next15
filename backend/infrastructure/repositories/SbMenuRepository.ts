@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
 import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
+import { MenuRelationsOptions } from "../../domain/repositories/options/MenuRelationsOptions";
 import { MenuImage } from "../../domain/entities/MenuImage";
 
 interface MenuTable {
@@ -151,13 +152,16 @@ export class SbMenuRepository implements MenuRepository {
 	}
 
 	// MenuSearchCriteria를 이용해서 메뉴 목록 조회
-	async findAll(criteria: MenuSearchCriteria): Promise<Menu[]> {
+	async findAll(
+		criteria: MenuSearchCriteria,
+		relations?: MenuRelationsOptions
+	): Promise<Menu[]> {
 		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
 		const selectArr = ["*"];
-		if (criteria.relations?.includeImages) {
+		if (relations?.includeImages) {
 			selectArr.push("images:menu_images(id,name,is_default)");
 		}
-		if (criteria.relations?.includeMember) {
+		if (relations?.includeMember) {
 			selectArr.push("member:members(id,name,email)");
 		}
 		const selectStr = selectArr.join(", ");
@@ -172,14 +176,28 @@ export class SbMenuRepository implements MenuRepository {
 	}
 
 	// 특정 메뉴 조회
-	async findById(id: number): Promise<Menu | null> {
+	async findById(
+		id: number,
+		relations?: MenuRelationsOptions
+	): Promise<Menu | null> {
+		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
+		const selectArr = ["*"];
+		if (relations?.includeImages) {
+			selectArr.push("images:menu_images(id,name,is_default)");
+		}
+		if (relations?.includeMember) {
+			selectArr.push("member:members(id,name,email)");
+		}
+		const selectStr = selectArr.join(", ");
+
 		const { data, error } = await this.supabase
 			.from("menus")
-			.select()
+			.select(selectStr)
 			.eq("id", id)
 			.single();
 		if (error) throw new Error(error.message);
-		return SbMenuRepository.mapToMenu(data);
+		if (!data) return null;
+		return SbMenuRepository.mapToMenu(data as unknown as MenuTable);
 	}
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)

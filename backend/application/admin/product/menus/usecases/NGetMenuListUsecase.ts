@@ -38,13 +38,14 @@ export class NGetMenuListUsecase {
 				queryDto.ascending ?? false,
 				!(queryDto.includeAll ?? false), // includeAll이 true면 publicOnly를 false로 설정 (모든 메뉴 조회)
 				offset,
-				limit,
-				{ includeImages: true } // images만 포함, member는 필요시 true로
+				limit
 			);
 		}
 
 		// 메뉴 목록 및 전체 개수 조회
-		const menus = await this.repository.findAll(criteria);
+		const menus = await this.repository.findAll(criteria, {
+			includeImages: true,
+		});
 		const menuCount: number = await this.repository.count(criteria);
 
 		console.log("============== menuCount : ", menuCount);

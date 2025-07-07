@@ -1,8 +1,3 @@
-export interface MenuRelationsOptions {
-	includeImages?: boolean;
-	includeMember?: boolean;
-}
-
 export class MenuSearchCriteria {
 	constructor(
 		public searchWord?: string,
@@ -12,7 +7,6 @@ export class MenuSearchCriteria {
 		public ascending: boolean = false,
 		public publicOnly: boolean = true, // 공개(isPublic=true) 데이터만 포함
 		public offset: number = 0,
-		public limit: number = 8,
-		public relations: MenuRelationsOptions = {}
+		public limit: number = 8
 	) {}
 }
