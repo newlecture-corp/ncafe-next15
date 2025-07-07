@@ -83,6 +83,7 @@ export default function MenuListPage() {
 									</td>
 								</tr>
 								<RowDetails />
+								<RowDetails />
 								<tr className="vertical-align:middle">
 									<td>2</td>
 									<td className="w:0 md:w:2 overflow:hidden">
@@ -118,6 +119,7 @@ export default function MenuListPage() {
 										</span>
 									</td>
 								</tr>
+								<RowDetails />
 								<RowDetails />
 							</tbody>
 						</table>
