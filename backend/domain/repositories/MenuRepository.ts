@@ -14,4 +14,5 @@ export interface MenuRepository {
 	// 조작 메소드들
 	save(menu: Menu): Promise<Menu>;
 	update(menu: Menu): Promise<Menu>;
+	delete(id: number): Promise<void>;
 }

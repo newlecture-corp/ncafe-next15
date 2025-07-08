@@ -3,24 +3,11 @@ import { MenuRepository } from "../../domain/repositories/MenuRepository";
 import { Menu } from "../../domain/entities/Menu";
 import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
 import { MenuRelationsOptions } from "../../domain/repositories/options/MenuRelationsOptions";
-import { MenuMapper } from "../mappers/MenuMapper";
+import { BaseMapper } from "../mappers/BaseMapper";
+import { MemberTable, MenuImageTable, MenuTable } from "../types/database";
+import { MenuImage } from "@/backend/domain/entities/MenuImage";
+import { Mapper } from "../mappers/Mapper";
 
-interface MenuTable {
-	id: number;
-	kor_name: string;
-	eng_name: string;
-	price: number;
-	has_ice: boolean;
-	created_at: string;
-	updated_at: string | null;
-	deleted_at: string | null;
-	member_id: string;
-	category_id: number;
-	description: string | null;
-	is_public: boolean;
-}
-
-// 메뉴 리포지토리 구현체
 export class SbMenuRepository implements MenuRepository {
 	private supabase;
 
@@ -113,21 +100,66 @@ export class SbMenuRepository implements MenuRepository {
 		criteria: MenuSearchCriteria,
 		relations?: MenuRelationsOptions
 	): Promise<Menu[]> {
-		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
-		const selectArr = ["*"];
-		if (relations?.includeImages) {
-			selectArr.push("images:menu_images(*)");
-		}
-		if (relations?.includeMember) {
-			selectArr.push("member:members(*)");
-		}
-		const selectStr = selectArr.join(", ");
+		// === 1. 쿼리 빌드하기
+		let query = null;
+		{
+			// 관계 데이터 포함 여부에 따라 select 쿼리 결정
+			const selectArr = ["*"];
+			if (relations?.includeImages) {
+				selectArr.push("images:menu_images(*)");
+			}
+			if (relations?.includeMember) {
+				selectArr.push("member:members(*)");
+			}
+			const selectStr = selectArr.join(", ");
 
-		const query = this.buildMenuQuery("menus", selectStr, criteria);
-		const { data, error } = await query;
-		if (error) throw new Error(error.message);
+			query = this.buildMenuQuery("menus", selectStr, criteria);
+		}
 
-		return MenuMapper.toMenuArray(data as unknown as MenuTable[]);
+		// === 2. 쿼리 실행하기
+		let result: MenuTable[] | null = null;
+		{
+			const { data, error } = await query;
+			if (error) throw new Error(error.message);
+
+			result = (data ?? []) as unknown as MenuTable[];
+		}
+
+		// === 3. 데이터 변환해서 담기
+		const menus: Menu[] = result.map((menu) => Mapper.toMenu(menu));
+
+		// === 4. images관계 데이터 변환하기
+		// images(관계 데이터) 포함 옵션이 있을 때만 추가 변환
+		if (relations?.includeImages && result && Array.isArray(result)) {
+			// menus와 data는 1:1 매칭이므로, 같은 인덱스끼리 매핑
+			menus.forEach((menu, idx) => {
+				// Supabase 원본 데이터에서 menu_images(관계 데이터) 추출
+				// 타입 단언을 통해 menu_images가 MenuImageTable[]임을 명확히 함
+				const raw = result[idx] as unknown as MenuTable & {
+					menu_images?: MenuImageTable[];
+				};
+
+				// menu_images가 존재하고 배열일 때만 변환
+				if (raw.menu_images && Array.isArray(raw.menu_images)) {
+					// menu_images 배열을 MenuImage 엔티티 배열로 변환하여 menu.menuImages에 할당
+					menu.menuImages = raw.menu_images.map((img) =>
+						Mapper.toMenuImage(img)
+					) as MenuImage[];
+				}
+			});
+		}
+
+		// === 5. member관계 데이터 변환하기
+		if (relations?.includeMember && result && Array.isArray(result)) {
+			menus.forEach((menu, idx) => {
+				const raw = result[idx] as unknown as MenuTable & {
+					member?: MemberTable;
+				};
+				menu.member = raw.member ? Mapper.toMember(raw.member) : undefined;
+			});
+		}
+
+		return menus;
 	}
 
 	// 특정 메뉴 조회
@@ -135,24 +167,60 @@ export class SbMenuRepository implements MenuRepository {
 		id: number,
 		relations?: MenuRelationsOptions
 	): Promise<Menu | null> {
-		// 관계 데이터 포함 여부에 따라 select 쿼리 결정
-		const selectArr = ["*"];
-		if (relations?.includeImages) {
-			selectArr.push("images:menu_images(*)");
-		}
-		if (relations?.includeMember) {
-			selectArr.push("member:members(*)");
-		}
-		const selectStr = selectArr.join(", ");
+		// === 1. 쿼리 빌드하기
+		let query = null;
+		{
+			const selectArr = ["*"];
+			if (relations?.includeImages) {
+				selectArr.push("images:menu_images(*)");
+			}
+			if (relations?.includeMember) {
+				selectArr.push("member:members(*)");
+			}
+			const selectStr = selectArr.join(", ");
 
-		const { data, error } = await this.supabase
-			.from("menus")
-			.select(selectStr)
-			.eq("id", id)
-			.single();
-		if (error) throw new Error(error.message);
-		if (!data) return null;
-		return MenuMapper.toMenu(data as unknown as MenuTable);
+			// 쿼리 빌더 사용
+			query = this.supabase
+				.from("menus")
+				.select(selectStr)
+				.eq("id", id)
+				.single();
+		}
+
+		// === 2. 쿼리 실행하기
+		let result: MenuTable | null = null;
+		{
+			const { data, error } = await query;
+			if (error) throw new Error(error.message);
+			if (!data) return null;
+
+			result = data as unknown as MenuTable;
+		}
+
+		// === 3. 데이터 변환해서 담기
+		const menu: Menu = BaseMapper.mapToCamelCase<MenuTable, Menu>(result);
+
+		// === 4. images관계 데이터 변환하기
+		if (relations?.includeImages && result) {
+			const raw = result as unknown as MenuTable & {
+				menu_images?: MenuImageTable[];
+			};
+			if (raw.menu_images && Array.isArray(raw.menu_images)) {
+				menu.menuImages = raw.menu_images.map((img) =>
+					Mapper.toMenuImage(img)
+				) as MenuImage[];
+			}
+		}
+
+		// === 5. member관계 데이터 변환하기
+		if (relations?.includeMember && result) {
+			const raw = result as unknown as MenuTable & {
+				member?: MemberTable;
+			};
+			menu.member = raw.member ? Mapper.toMember(raw.member) : undefined;
+		}
+
+		return menu;
 	}
 
 	// 메뉴 개수 조회 (필터링된 레코드 수)
@@ -175,7 +243,8 @@ export class SbMenuRepository implements MenuRepository {
 			.select()
 			.single();
 		if (error) throw new Error(error.message);
-		return data as Menu;
+
+		return BaseMapper.mapToCamelCase<MenuTable, Menu>(data);
 	}
 
 	// 메뉴 수정
@@ -188,6 +257,12 @@ export class SbMenuRepository implements MenuRepository {
 			.select()
 			.single();
 		if (error) throw new Error(error.message);
-		return data as Menu;
+
+		return BaseMapper.mapToCamelCase<MenuTable, Menu>(data);
+	}
+
+	async delete(id: number): Promise<void> {
+		const { error } = await this.supabase.from("menus").delete().eq("id", id);
+		if (error) throw new Error(error.message);
 	}
 }

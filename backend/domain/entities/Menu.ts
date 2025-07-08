@@ -1,4 +1,6 @@
 import { MenuImage } from "./MenuImage";
+import { Category } from "./Category";
+import { Member } from "./Member";
 
 export class Menu {
 	constructor(
@@ -16,6 +18,8 @@ export class Menu {
 		public description: string | null = null,
 
 		// 관계가 있는 엔티티
-		public menuImages: MenuImage[]
+		public menuImages?: MenuImage[],
+		public category?: Category, // N:1
+		public member?: Member // N:1
 	) {}
 }
