@@ -1,5 +1,5 @@
 import { GetMenuListDto } from "../dtos/GetMenuListDto";
-import { MenuDto } from "../dtos/MenuDto";
+import { MenuDto } from "../dtos/GetMenuDto";
 import { GetMenuListQueryDto } from "../dtos/GetMenuListQueryDto";
 import { MenuSearchCriteria } from "@/backend/domain/repositories/criteria/MenuSearchCriteria";
 import { MenuRepository } from "@/backend/domain/repositories/MenuRepository";
@@ -60,18 +60,18 @@ export class NGetMenuListUsecase {
 		const menuDtos: MenuDto[] = menus.map(
 			(m) =>
 				new MenuDto(
-					m.id,
-					m.korName,
-					m.engName,
-					m.price,
-					m.hasIce,
-					m.createdAt,
-					m.isPublic,
-					m.memberId,
-					m.categoryId,
-					m.updatedAt,
-					m.deletedAt,
-					m.description,
+					m.id ?? 0,
+					m.korName ?? "",
+					m.engName ?? "",
+					m.price ?? 0,
+					m.hasIce ?? false,
+					m.createdAt ?? new Date(),
+					m.isPublic ?? false,
+					m.memberId ?? "",
+					m.categoryId ?? 0,
+					m.updatedAt ?? null,
+					m.deletedAt ?? null,
+					m.description ?? null,
 					m.menuImages?.find((image) => image.isDefault)?.name ?? null
 				)
 		);

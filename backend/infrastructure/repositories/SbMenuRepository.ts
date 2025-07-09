@@ -239,12 +239,23 @@ export class SbMenuRepository implements MenuRepository {
 	async save(menu: Menu): Promise<Menu> {
 		const { data, error } = await this.supabase
 			.from("menus")
-			.insert([menu])
+			.insert({
+				kor_name: menu.korName,
+				eng_name: menu.engName,
+				price: menu.price,
+				description: menu.description,
+				member_id: menu.memberId,
+				category_id: menu.categoryId,
+			})
 			.select()
 			.single();
-		if (error) throw new Error(error.message);
 
-		return BaseMapper.mapToCamelCase<MenuTable, Menu>(data);
+		if (error) {
+			throw new Error(`Failed to save menu: ${error.message}`);
+		}
+
+		// Return the saved menu
+		return Mapper.toMenu(data);
 	}
 
 	// 메뉴 수정

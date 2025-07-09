@@ -43,14 +43,11 @@ export class Mapper {
 			source.kor_name,
 			source.eng_name,
 			source.price,
-			source.has_ice,
-			new Date(source.created_at),
-			source.is_public,
 			source.member_id,
 			source.category_id,
-			source.updated_at ? new Date(source.updated_at) : null,
-			source.deleted_at ? new Date(source.deleted_at) : null,
-			source.description ?? null
+			source.has_ice,
+			new Date(source.created_at),
+			source.is_public
 		);
 	}
 

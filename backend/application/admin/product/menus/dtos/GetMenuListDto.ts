@@ -1,4 +1,4 @@
-import { MenuDto } from "./MenuDto";
+import { MenuDto } from "./GetMenuDto";
 
 export class GetMenuListDto {
 	constructor(

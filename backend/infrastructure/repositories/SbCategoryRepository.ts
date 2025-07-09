@@ -77,8 +77,8 @@ export class SbCategoryRepository implements CategoryRepository {
 				{
 					id: category.id,
 					name: category.name,
-					isPublic: category.isPublic,
-					createdAt: category.createdAt.toISOString(),
+					is_public: category.isPublic,
+					created_at: category.createdAt.toISOString(),
 					order: category.order,
 				},
 			])
