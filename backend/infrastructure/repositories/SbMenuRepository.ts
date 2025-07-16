@@ -133,16 +133,16 @@ export class SbMenuRepository implements MenuRepository {
 		if (relations?.includeImages && result && Array.isArray(result)) {
 			// menus와 data는 1:1 매칭이므로, 같은 인덱스끼리 매핑
 			menus.forEach((menu, idx) => {
-				// Supabase 원본 데이터에서 menu_images(관계 데이터) 추출
-				// 타입 단언을 통해 menu_images가 MenuImageTable[]임을 명확히 함
+				// Supabase 원본 데이터에서 images(관계 데이터) 추출
+				// 타입 단언을 통해 images가 MenuImageTable[]임을 명확히 함
 				const raw = result[idx] as unknown as MenuTable & {
-					menu_images?: MenuImageTable[];
+					images?: MenuImageTable[];
 				};
 
-				// menu_images가 존재하고 배열일 때만 변환
-				if (raw.menu_images && Array.isArray(raw.menu_images)) {
-					// menu_images 배열을 MenuImage 엔티티 배열로 변환하여 menu.menuImages에 할당
-					menu.menuImages = raw.menu_images.map((img) =>
+				// images가 존재하고 배열일 때만 변환
+				if (raw.images && Array.isArray(raw.images)) {
+					// images 배열을 MenuImage 엔티티 배열로 변환하여 menu.menuImages에 할당
+					menu.menuImages = raw.images.map((img) =>
 						Mapper.toMenuImage(img)
 					) as MenuImage[];
 				}
@@ -203,10 +203,10 @@ export class SbMenuRepository implements MenuRepository {
 		// === 4. images관계 데이터 변환하기
 		if (relations?.includeImages && result) {
 			const raw = result as unknown as MenuTable & {
-				menu_images?: MenuImageTable[];
+				images?: MenuImageTable[];
 			};
-			if (raw.menu_images && Array.isArray(raw.menu_images)) {
-				menu.menuImages = raw.menu_images.map((img) =>
+			if (raw.images && Array.isArray(raw.images)) {
+				menu.menuImages = raw.images.map((img) =>
 					Mapper.toMenuImage(img)
 				) as MenuImage[];
 			}

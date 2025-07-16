@@ -48,14 +48,6 @@ export class NGetMenuListUsecase {
 		});
 		const menuCount: number = await this.repository.count(criteria);
 
-		console.log("============== menuCount : ", menuCount);
-		console.log("============== menus.length : ", menus.length);
-		console.log("============== pageSize : ", pageSize);
-		console.log(
-			"============== endPage 계산 : ",
-			Math.ceil(menuCount / pageSize)
-		);
-
 		// 메뉴 목록을 DTO로 변환
 		const menuDtos: MenuDto[] = menus.map(
 			(m) =>
