@@ -13,7 +13,7 @@ const {
 	["menu-info"]: menuInfo,
 	price,
 	like,
-	pay
+	pay,
 } = styles;
 
 export default function MenuListPage() {
@@ -21,14 +21,18 @@ export default function MenuListPage() {
 		<main>
 			<FilterForm />
 
-
 			<div className={menusBox}>
 				<section className={menus}>
 					<h1 className="d:none">메뉴 목록</h1>
 					<div className={list}>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/americano.png" alt="아메리카노" width={200} height={200} />
+								<Image
+									src="/image/product/americano.png"
+									alt="아메리카노"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -39,19 +43,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -62,19 +79,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -85,19 +115,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -108,19 +151,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -131,19 +187,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -154,19 +223,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -177,19 +259,32 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
 						<section className={menuCard}>
 							<div className={imgBox}>
-								<Image src="/image/product/cafe_latte.png" alt="카페라떼" width={200} height={200} />
+								<Image
+									src="/image/product/cafe_latte.png"
+									alt="카페라떼"
+									width={200}
+									height={200}
+								/>
 							</div>
 							<div className={menuInfo}>
 								<h1>
@@ -200,13 +295,21 @@ export default function MenuListPage() {
 								<div className={like}>
 									<label className="n-icon n-icon:favorite">
 										좋아요
-										<input className="d:none" type="checkbox" defaultValue={1} />
+										<input
+											className="d:none"
+											type="checkbox"
+											defaultValue={1}
+										/>
 									</label>
 									<span>2</span>
 								</div>
 								<div className={pay}>
-									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">장바구니에 담기</button>
-									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">주문하기</button>
+									<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
+										장바구니에 담기
+									</button>
+									<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
+										주문하기
+									</button>
 								</div>
 							</div>
 						</section>
