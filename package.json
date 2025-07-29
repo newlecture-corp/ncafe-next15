@@ -8,13 +8,19 @@
 		"start": "next start",
 		"lint": "next lint"
 	},
+	"prisma": {
+		"seed": "tsx prisma/seed.ts"
+	},
 	"dependencies": {
 		"@prisma/client": "^6.12.0",
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.49.4",
+		"bcryptjs": "^3.0.2",
+		"jsonwebtoken": "^9.0.2",
 		"ncafe-next15-app": "file:",
 		"newtil-css": "^0.2.72",
 		"next": "15.2.4",
+		"next-auth": "^4.24.11",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"sass": "^1.86.3"

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.scss";
 import FilterForm from "./components/FilterForm";
-import { GetMenuListDto } from '@/backend/application/menes/dtos/GetMenuListDto';
+import { GetMenuListDto } from "@/backend/application/menes/dtos/GetMenuListDto";
 
 const {
 	["menus-box"]: menusBox,
@@ -17,12 +17,21 @@ const {
 	pay,
 } = styles;
 
-export default async function MenuListPage() {
+export default async function MenuListPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ c?: string; q?: string; p?: string }>;
+}) {
+	const params = await searchParams;
+	const url = new URL("http://localhost:3000/api/menus");
+	if (params.c) url.searchParams.set("cid", params.c);
+	if (params.q) url.searchParams.set("q", params.q);
+	url.searchParams.set("p", params.p || "1");
 
-	const res = await fetch("http://localhost:3000/api/menus");
+	const res = await fetch(url.toString());
 	const data: GetMenuListDto = await res.json();
-	console.log(data);
-	
+	// console.log(data);
+
 	return (
 		<main>
 			<FilterForm />
@@ -31,13 +40,16 @@ export default async function MenuListPage() {
 				<section className={menus}>
 					<h1 className="d:none">메뉴 목록</h1>
 					<div className={list}>
-
 						{data.menus.map((menu) => (
 							<section key={menu.id} className={menuCard}>
 								<div className={imgBox}>
 									<Image
-										src={menu.defaultImage || "/image/product/default.png"}
-										alt={menu.korName}
+										src={
+											menu.defaultImage
+												? `/image/product/${menu.defaultImage}`
+												: "/image/product/default.png"
+										}
+										alt={menu.korName || ""}
 										width={200}
 										height={200}
 									/>
@@ -47,7 +59,7 @@ export default async function MenuListPage() {
 										<Link href={`/menus/${menu.id}`}>{menu.korName}</Link>
 									</h1>
 									<h2>{menu.engName}</h2>
-									<div className={price}>{menu.price.toLocaleString()}원</div>
+									<div className={price}>{menu.price?.toLocaleString()}원</div>
 									<div className={like}>
 										<label className="n-icon n-icon:favorite">
 											좋아요
@@ -57,7 +69,7 @@ export default async function MenuListPage() {
 												defaultValue={menu.id}
 											/>
 										</label>
-										<span>{menu.likeCount}</span>
+										<span>0</span>
 									</div>
 									<div className={pay}>
 										<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
@@ -70,7 +82,6 @@ export default async function MenuListPage() {
 								</div>
 							</section>
 						))}
-
 					</div>
 				</section>
 			</div>

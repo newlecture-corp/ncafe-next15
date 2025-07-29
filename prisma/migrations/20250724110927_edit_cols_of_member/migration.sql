@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "members" ADD COLUMN     "is_active" BOOLEAN NOT NULL DEFAULT true,
+ALTER COLUMN "email" DROP NOT NULL,
+ALTER COLUMN "updated_at" DROP NOT NULL,
+ALTER COLUMN "phone" DROP NOT NULL;

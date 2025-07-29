@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import styles from "./RootHeader.module.scss";
 
 // 스타일 모듈을 쉽게 사용하기 위해 destructuring & camel 표기로 매핑
@@ -10,16 +12,27 @@ const {
 } = styles;
 
 const RootHeader = () => {
+	const { data: session, status } = useSession();
+	const router = useRouter();
+
+	console.log("=== header test session print===");
+	console.log("RootHeader Session:", session);
+	console.log("RootHeader Status:", status);
+	console.log("=== header test session print===");
+
+	const handleSignOut = async (e: React.MouseEvent) => {
+		e.preventDefault();
+		await signOut({ redirect: false });
+		router.push("/");
+	};
+
 	return (
 		<header className={`${header}`}>
 			<h1>
 				<Link href="/">NCafe</Link>
 			</h1>
 			<div className={topMobileMenu}>
-				<Link
-					className="n-icon n-icon:menu n-icon-color:base-1"
-					href="#"
-				>
+				<Link className="n-icon n-icon:menu n-icon-color:base-1" href="#">
 					숨김버튼
 				</Link>
 			</div>
@@ -41,9 +54,22 @@ const RootHeader = () => {
 							</Link>
 						</li>
 						<li>
-							<a className="n-icon n-icon:login n-icon-color:base-1" href="#">
-								로그인
-							</a>
+							{session ? (
+								<Link
+									className="n-icon n-icon:logout n-icon-color:base-1"
+									href="#"
+									onClick={handleSignOut}
+								>
+									로그아웃
+								</Link>
+							) : (
+								<Link
+									className="n-icon n-icon:login n-icon-color:base-1"
+									href="/login"
+								>
+									로그인
+								</Link>
+							)}
 						</li>
 					</ul>
 				</nav>
