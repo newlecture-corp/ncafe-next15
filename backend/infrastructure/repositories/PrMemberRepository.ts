@@ -33,11 +33,11 @@ export class PrMemberRepository implements MemberRepository {
 		const created = await prisma.member.create({
 			data: {
 				username: member.username,
-				password: member.password,
+				password: member.password ?? "",
 				email: member.email,
-				phone: member.phone,
-				createdAt: member.createdAt,
-				updatedAt: member.updatedAt,
+				phone: member.phone ?? "",
+				createdAt: member.createdAt ?? new Date(),
+				updatedAt: member.updatedAt ?? new Date(),
 			},
 		});
 		return created as Member;
@@ -48,7 +48,7 @@ export class PrMemberRepository implements MemberRepository {
 			where: { id: member.id },
 			data: {
 				username: member.username,
-				password: member.password,
+				password: member.password ?? "",
 			},
 		});
 

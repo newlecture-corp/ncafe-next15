@@ -9,8 +9,20 @@ export class GetMenuListUsecase {
 	constructor(private readonly menuRepository: MenuRepository) {}
 
 	async execute(query: GetMenuListQueryDto): Promise<GetMenuListDto> {
-		const pageSize = 10;
+		const pageSize = 8;
 		const offset = (query.pageNum - 1) * pageSize;
+
+		// 전체 메뉴 개수 조회
+		const totalCount = await this.menuRepository.count({
+			searchWord: query.query,
+			categoryId: query.categoryId,
+			publicOnly: false,
+			sortField: "createdAt", // count에서는 사용하지 않지만 필수 속성
+			ascending: false, // count에서는 사용하지 않지만 필수 속성
+			offset: 0, // count에서는 사용하지 않지만 필수 속성
+			limit: 0, // count에서는 사용하지 않지만 필수 속성
+		});
+
 		const menus: Menu[] = await this.menuRepository.findAll(
 			{
 				offset: offset,
@@ -44,7 +56,7 @@ export class GetMenuListUsecase {
 			return dto;
 		});
 
-		const endPage = Math.ceil(menus.length / 10);
+		const endPage = Math.ceil(totalCount / pageSize);
 		return {
 			menus: getMenuDtos,
 			endPage,

@@ -4,6 +4,8 @@ import Image from "next/image";
 import styles from "./page.module.scss";
 import FilterForm from "./components/FilterForm";
 import { GetMenuListDto } from "@/backend/application/menes/dtos/GetMenuListDto";
+import Pager from "../components/Pager";
+import AddToBasketButton from "./components/AddToBasketButton";
 
 const {
 	["menus-box"]: menusBox,
@@ -23,14 +25,21 @@ export default async function MenuListPage({
 	searchParams: Promise<{ c?: string; q?: string; p?: string }>;
 }) {
 	const params = await searchParams;
+	const currentPage = Number(params.p) || 1;
 	const url = new URL("http://localhost:3000/api/menus");
 	if (params.c) url.searchParams.set("cid", params.c);
 	if (params.q) url.searchParams.set("q", params.q);
-	url.searchParams.set("p", params.p || "1");
+	url.searchParams.set("p", currentPage.toString());
 
 	const res = await fetch(url.toString());
 	const data: GetMenuListDto = await res.json();
 	// console.log(data);
+
+	// 쿼리 파라미터 구성
+	const queryParams: Record<string, string> = {};
+	if (params.c) queryParams.c = params.c;
+	if (params.q) queryParams.q = params.q;
+	queryParams.p = currentPage.toString();
 
 	return (
 		<main>
@@ -72,9 +81,15 @@ export default async function MenuListPage({
 										<span>0</span>
 									</div>
 									<div className={pay}>
-										<button className="n-icon n-icon:shopping_cart n-btn n-btn:rounded n-btn-color:main">
-											장바구니에 담기
-										</button>
+										<AddToBasketButton
+											menu={{
+												id: menu.id!,
+												korName: menu.korName!,
+												engName: menu.engName!,
+												price: menu.price!,
+												defaultImage: menu.defaultImage,
+											}}
+										/>
 										<button className="n-icon n-icon:credit_card n-btn n-btn:rounded n-btn-color:sub">
 											주문하기
 										</button>
@@ -83,6 +98,11 @@ export default async function MenuListPage({
 							</section>
 						))}
 					</div>
+					<Pager
+						endPage={data.endPage}
+						baseUrl="/menus"
+						queryParams={queryParams}
+					/>
 				</section>
 			</div>
 		</main>

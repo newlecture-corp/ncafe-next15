@@ -49,6 +49,9 @@ const FilterForm = () => {
 		e.preventDefault();
 		if (searchValue.trim()) {
 			router.push(`/menus?q=${encodeURIComponent(searchValue.trim())}`);
+		} else {
+			// 검색어가 비어있으면 검색 쿼리 파라미터 제거
+			router.push("/menus");
 		}
 	};
 

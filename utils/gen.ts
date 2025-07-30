@@ -1,5 +1,4 @@
-import { SignJWT } from "jose";
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 
 // 비밀 키
 const secret = "my-secret-key";
@@ -12,7 +11,7 @@ const secret = "my-secret-key";
 		.sign(secretKey);
 	console.log("Generated Token:", token);
 
-	// 2. jsonwebtoken으로 JWT 검증
-	const decoded = jwt.verify(token, secret);
-	console.log("Verified Payload:", decoded);
+	// 2. jose로 JWT 검증
+	const { payload } = await jwtVerify(token, secretKey);
+	console.log("Verified Payload:", payload);
 })();

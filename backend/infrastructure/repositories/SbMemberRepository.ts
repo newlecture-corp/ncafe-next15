@@ -78,7 +78,8 @@ export class SbMemberRepository implements MemberRepository {
 					username: member.username,
 					password: member.password,
 					email: member.email,
-					created_at: member.createdAt.toISOString(),
+					created_at:
+						member.createdAt?.toISOString() ?? new Date().toISOString(),
 					deleted_at: member.deletedAt ? member.deletedAt.toISOString() : null,
 					image: member.profileImage,
 					updated_at: member.updatedAt ? member.updatedAt.toISOString() : null,
@@ -99,7 +100,7 @@ export class SbMemberRepository implements MemberRepository {
 				username: member.username,
 				password: member.password,
 				email: member.email,
-				created_at: member.createdAt.toISOString(),
+				created_at: member.createdAt?.toISOString() ?? new Date().toISOString(),
 				deleted_at: member.deletedAt ? member.deletedAt.toISOString() : null,
 				image: member.profileImage,
 				updated_at: member.updatedAt ? member.updatedAt.toISOString() : null,
