@@ -1,6 +1,6 @@
 "use client";
 
-import { useBasket } from "@/app/(anon)/hooks/useBasket";
+import { useBasketStore } from "@/stores/basketStore";
 
 interface AddToBasketButtonProps {
 	menu: {
@@ -13,10 +13,10 @@ interface AddToBasketButtonProps {
 }
 
 const AddToBasketButton = ({ menu }: AddToBasketButtonProps) => {
-	const { addToBasket } = useBasket();
+	const addItem = useBasketStore((state) => state.addItem);
 
 	const handleAddToBasket = () => {
-		addToBasket({
+		addItem({
 			id: menu.id,
 			korName: menu.korName,
 			engName: menu.engName,
