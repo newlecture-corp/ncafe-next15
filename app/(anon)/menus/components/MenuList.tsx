@@ -38,7 +38,7 @@ export default function MenuList({
 			setLoading(true);
 			try {
 				const url = new URL("http://localhost:3000/api/menus");
-				if (categoryId) url.searchParams.set("cid", categoryId);
+				if (categoryId) url.searchParams.set("c", categoryId);
 				if (query) url.searchParams.set("q", query);
 				url.searchParams.set("p", currentPage.toString());
 
