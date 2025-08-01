@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -21,27 +21,10 @@ function MenuLikeButton({
 	const [likeCount, setLikeCount] = useState(initialLikeCount);
 	const [isLoading, setIsLoading] = useState(false);
 
-	// 컴포넌트 마운트 시 사용자의 좋아요 상태 확인
-	useEffect(() => {
-		const checkLikeStatus = async () => {
-			if (!session?.user) return;
-
-			try {
-				const response = await fetch(`/api/member/menu-likes?menuId=${menuId}`);
-				if (response.ok) {
-					const data = await response.json();
-					if (data.success) {
-						setIsLiked(data.isLiked);
-						setLikeCount(data.likeCount);
-					}
-				}
-			} catch (error) {
-				console.error("좋아요 상태 확인 중 오류:", error);
-			}
-		};
-
-		checkLikeStatus();
-	}, [session, menuId]);
+	// 디버깅용 로그
+	console.log(
+		`Menu ${menuId}: initialIsLiked=${initialIsLiked}, isLiked=${isLiked}`
+	);
 
 	const handleLikeToggle = async () => {
 		if (isLoading) return;

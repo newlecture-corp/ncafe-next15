@@ -8,7 +8,10 @@ import { Menu } from "@/backend/domain/entities/Menu";
 export class GetMenuListUsecase {
 	constructor(private readonly menuRepository: MenuRepository) {}
 
-	async execute(query: GetMenuListQueryDto): Promise<GetMenuListDto> {
+	async execute(
+		query: GetMenuListQueryDto,
+		currentUserId?: string
+	): Promise<GetMenuListDto> {
 		const pageSize = 8;
 		const offset = (query.pageNum - 1) * pageSize;
 
@@ -56,6 +59,15 @@ export class GetMenuListUsecase {
 
 			// likes 배열의 길이를 likeCount로 설정
 			dto.likeCount = menu.likes?.length || 0;
+
+			// 현재 사용자가 이 메뉴에 좋아요를 눌렀는지 확인
+			if (currentUserId && menu.likes) {
+				dto.isLikedByMe = menu.likes.some(
+					(like) => like.memberId === currentUserId
+				);
+			} else {
+				dto.isLikedByMe = false;
+			}
 
 			return dto;
 		});
