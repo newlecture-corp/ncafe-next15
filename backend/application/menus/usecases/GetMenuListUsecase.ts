@@ -36,6 +36,7 @@ export class GetMenuListUsecase {
 			},
 			{
 				includeImages: true,
+				includeLikes: true,
 			}
 		);
 
@@ -52,6 +53,9 @@ export class GetMenuListUsecase {
 				(image) => image.isDefault === true
 			);
 			dto.defaultImage = defaultImage?.name || "";
+
+			// likes 배열의 길이를 likeCount로 설정
+			dto.likeCount = menu.likes?.length || 0;
 
 			return dto;
 		});

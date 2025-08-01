@@ -3,9 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.scss";
 import FilterForm from "./components/FilterForm";
-import { GetMenuListDto } from "@/backend/application/menes/dtos/GetMenuListDto";
+import { GetMenuListDto } from "@/backend/application/menus/dtos/GetMenuListDto";
 import Pager from "../components/Pager";
 import AddToBasketButton from "./components/AddToBasketButton";
+import MenuLikeButton from "./components/MenuLikeButton";
 
 const {
 	["menus-box"]: menusBox,
@@ -70,15 +71,10 @@ export default async function MenuListPage({
 									<h2>{menu.engName}</h2>
 									<div className={price}>{menu.price?.toLocaleString()}원</div>
 									<div className={like}>
-										<label className="n-icon n-icon:favorite">
-											좋아요
-											<input
-												className="d:none"
-												type="checkbox"
-												defaultValue={menu.id}
-											/>
-										</label>
-										<span>0</span>
+										<MenuLikeButton
+											menuId={menu.id!}
+											initialLikeCount={menu.likeCount || 0}
+										/>
 									</div>
 									<div className={pay}>
 										<AddToBasketButton

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GetMenuListUsecase } from "@/backend/application/menes/usecases/GetMenuListUsecase";
-import { GetMenuListQueryDto } from "@/backend/application/menes/dtos/GetMenuListQueryDto";
+import { GetMenuListUsecase } from "@/backend/application/menus/usecases/GetMenuListUsecase";
+import { GetMenuListQueryDto } from "@/backend/application/menus/dtos/GetMenuListQueryDto";
 import { PrMenuRepository } from "@/backend/infrastructure/repositories/PrMenuRepository";
 
 // GET /api/menus?p=1&cid=2&q=검색어

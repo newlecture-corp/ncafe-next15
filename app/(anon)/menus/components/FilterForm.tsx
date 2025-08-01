@@ -3,7 +3,7 @@
 import styles from "./FilterForm.module.scss";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { GetCategoryDto } from "@/backend/application/menes/dtos/GetCategoryDto";
+import { GetCategoryDto } from "@/backend/application/menus/dtos/GetCategoryDto";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const {

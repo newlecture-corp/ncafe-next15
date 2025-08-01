@@ -68,22 +68,32 @@
 				}
 
 				.like {
+					color: var(--color-main-3);
 					position: absolute;
 					right: 0;
 					top: 0;
 
 					display: flex;
 					align-items: center;
-
 					gap: 6px;
 
-					.n-icon\:heart {
+					label {
 						cursor: pointer;
+						transition: color 0.2s ease;
+
+						&:hover {
+							color: #ff6b9d;
+						}
+
+						&.liked {
+							color: #ff6b9d;
+						}
 					}
 
-					.n-icon\:heart:has(:checked)::before {
-						--icon: url(/image/icon/heart_fill.svg);
-						background-color: red;
+					span {
+						font-size: 12px;
+						color: #333;
+						font-weight: 500;
 					}
 				}
 
@@ -94,6 +104,7 @@
 					position: absolute;
 					right: 0;
 					bottom: 0;
+					z-index: 1;
 				}
 			}
 		}
@@ -129,6 +140,20 @@
 						width: 100%;
 						height: 100%;
 						object-fit: cover;
+					}
+				}
+
+				.menu-info {
+					.like {
+						position: absolute;
+						right: 0;
+						top: 0;
+					}
+
+					.pay {
+						position: absolute;
+						right: 0;
+						bottom: 0;
 					}
 				}
 			}

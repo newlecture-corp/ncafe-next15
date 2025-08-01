@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.scss";
 
 const {
@@ -17,6 +17,8 @@ export default function LoginPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const callbackUrl = searchParams.get("callbackUrl") || "/";
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -37,7 +39,7 @@ export default function LoginPage() {
 			if (result?.error) {
 				setError("아이디 또는 비밀번호가 올바르지 않습니다.");
 			} else {
-				router.push("/");
+				router.push(callbackUrl);
 			}
 		} catch {
 			setError("로그인 중 오류가 발생했습니다.");

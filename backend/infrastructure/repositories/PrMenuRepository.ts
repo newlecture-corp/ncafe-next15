@@ -43,6 +43,7 @@ export class PrMenuRepository implements MenuRepository {
 		const include: Record<string, boolean> = {};
 		if (relations?.includeImages) include.images = true;
 		if (relations?.includeMember) include.member = true;
+		if (relations?.includeLikes) include.likes = true;
 
 		const menus = await prisma.menu.findMany({
 			where,
@@ -65,6 +66,7 @@ export class PrMenuRepository implements MenuRepository {
 		const include: Record<string, boolean> = {};
 		if (relations?.includeImages) include.images = true;
 		if (relations?.includeMember) include.member = true;
+		if (relations?.includeLikes) include.likes = true;
 		const menu = await prisma.menu.findUnique({
 			where: { id },
 			include,

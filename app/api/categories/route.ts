@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { GetCategoryListUsecase } from "@/backend/application/menes/usecases/GetCategoryListUsecase";
+import { GetCategoryListUsecase } from "@/backend/application/menus/usecases/GetCategoryListUsecase";
 import { PrCategoryRepository } from "@/backend/infrastructure/repositories/PrCategoryRepository";
 
 // GET /api/categories
