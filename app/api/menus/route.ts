@@ -21,6 +21,8 @@ export async function GET(req: NextRequest) {
 	const usecase = new GetMenuListUsecase(new PrMenuRepository());
 	const queryDto = new GetMenuListQueryDto(c, p, q);
 
+	console.log("currentUserId : ", currentUserId);
+
 	const result = await usecase.execute(queryDto, currentUserId);
 
 	return NextResponse.json(result);
