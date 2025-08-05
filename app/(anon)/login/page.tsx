@@ -95,12 +95,20 @@ export default function LoginPage() {
 					</form>
 					<div>또는</div>
 					<div>
-						<Link
-							href="/"
+						<button
+							onClick={() => signIn("google", { callbackUrl })}
 							className={`${btnGoogleLogin} n-icon n-icon:google_logo n-deco`}
+							style={{
+								background: "none",
+								border: "none",
+								cursor: "pointer",
+								width: "100%",
+								padding: "10px",
+								fontSize: "16px",
+							}}
 						>
 							구글로 로그인
-						</Link>
+						</button>
 					</div>
 					<div className={linkBox}>
 						<Link href="signup">회원가입</Link>
