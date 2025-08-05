@@ -7,6 +7,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
 
 // GET /api/menus?p=1&c=2&q=검색어
 export async function GET(req: NextRequest) {
+	// 3초 지연 추가 (로딩 상태 테스트용)
+	// await new Promise((resolve) => setTimeout(resolve, 3000));
+
 	// 쿼리스트링에서 p, c, q 추출
 	const { searchParams } = new URL(req.url);
 	const p = Number(searchParams.get("p")) || 1;
