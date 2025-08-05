@@ -58,7 +58,7 @@ async function MenuListWithData({
 	}
 
 	const data: GetMenuListDto = await res.json();
-	console.log(data.menus);
+	// console.log(data.menus);
 
 	const queryParams: Record<string, string> = {};
 	if (params.c) queryParams.c = params.c;
