@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import NextAuthSessionProvider from "./components/NextAuthSessionProvider";
 import RootFooter from "./components/RootFooter";
 import RootHeader from "./components/RootHeader";

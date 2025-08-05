@@ -3,7 +3,7 @@ import { GetMenuListUsecase } from "@/backend/application/menus/usecases/GetMenu
 import { GetMenuListQueryDto } from "@/backend/application/menus/dtos/GetMenuListQueryDto";
 import { PrMenuRepository } from "@/backend/infrastructure/repositories/PrMenuRepository";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
 // GET /api/menus?p=1&c=2&q=검색어
 export async function GET(req: NextRequest) {
