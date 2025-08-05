@@ -5,7 +5,20 @@ import { MemberRelationsOptions } from "@/backend/domain/repositories/options/Me
 
 export class PrMemberRepository implements MemberRepository {
 	async findByUsername(username: string): Promise<Member | null> {
-		const member = await prisma.member.findUnique({ where: { username } });
+		console.log("🔍 PrMemberRepository.findByUsername 호출:", username);
+
+		const member = await prisma.member.findUnique({
+			where: { username },
+			include: {
+				memberRoles: {
+					include: {
+						role: true,
+					},
+				},
+			},
+		});
+
+		console.log("📊 조회된 회원 데이터:", JSON.stringify(member, null, 2));
 		return member as Member | null;
 	}
 
