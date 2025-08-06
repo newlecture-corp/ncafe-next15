@@ -7,13 +7,15 @@ export class Member {
 	constructor(
 		public id: string,
 		public email: string,
-		public username: string,
+		public username?: string,
 		public phone?: string,
 		public createdAt?: Date,
 		public updatedAt?: Date,
 		public deletedAt?: Date | null,
 		public password?: string,
 		public profileImage?: string | null,
+		public provider?: string,
+		public providerId?: string,
 
 		// Relations
 		public categories?: Category[],

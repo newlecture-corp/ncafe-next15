@@ -8,6 +8,7 @@ export interface MemberRepository {
 		relations?: MemberRelationsOptions
 	): Promise<Member | null>;
 	findByUsername(username: string): Promise<Member | null>;
+	findByEmail(email: string): Promise<Member | null>;
 	save(member: Member): Promise<Member>;
 	update(member: Member): Promise<Member>;
 	delete(id: string): Promise<void>;

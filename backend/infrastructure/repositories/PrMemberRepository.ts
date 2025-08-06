@@ -22,6 +22,24 @@ export class PrMemberRepository implements MemberRepository {
 		return member as Member | null;
 	}
 
+	async findByEmail(email: string): Promise<Member | null> {
+		console.log("🔍 PrMemberRepository.findByEmail 호출:", email);
+
+		const member = await prisma.member.findUnique({
+			where: { email },
+			include: {
+				memberRoles: {
+					include: {
+						role: true,
+					},
+				},
+			},
+		});
+
+		console.log("📊 조회된 회원 데이터:", JSON.stringify(member, null, 2));
+		return member as Member | null;
+	}
+
 	async findAll(relations?: MemberRelationsOptions): Promise<Member[]> {
 		const include: Record<string, boolean> = {};
 		if (relations?.includeMenus) include.menus = true;
@@ -46,9 +64,12 @@ export class PrMemberRepository implements MemberRepository {
 		const created = await prisma.member.create({
 			data: {
 				username: member.username,
-				password: member.password ?? "",
+				password: member.password,
 				email: member.email,
-				phone: member.phone ?? "",
+				phone: member.phone,
+				profileImage: member.profileImage,
+				provider: member.provider,
+				providerId: member.providerId,
 				createdAt: member.createdAt ?? new Date(),
 				updatedAt: member.updatedAt ?? new Date(),
 			},

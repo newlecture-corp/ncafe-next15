@@ -1,12 +1,26 @@
 import { Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { LoginUsecase } from "@/backend/application/auth/usecases/LoginUsecase";
 import { LoginRequestDto } from "@/backend/application/auth/dtos/LoginRequestDto";
+import { GoogleLoginUsecase } from "@/backend/application/auth/usecases/GoogleLoginUsecase";
 import { PrMemberRepository } from "@/backend/infrastructure/repositories/PrMemberRepository";
+import { PrMemberRoleRepository } from "@/backend/infrastructure/repositories/PrMemberRoleRepository";
 
 export const authOptions = {
 	providers: [
+		GoogleProvider({
+			clientId: process.env.GOOGLE_CLIENT_ID!,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+			authorization: {
+				params: {
+					prompt: "consent",
+					access_type: "offline",
+					response_type: "code",
+				},
+			},
+		}),
 		CredentialsProvider({
 			name: "Credentials",
 			credentials: {
@@ -52,6 +66,61 @@ export const authOptions = {
 		}),
 	],
 	callbacks: {
+		async signIn({
+			user,
+			account,
+			profile,
+		}: {
+			user: User;
+			account: { provider: string } | null;
+			profile: {
+				sub: string;
+				email: string;
+				name: string;
+				picture: string;
+			} | null;
+		}) {
+			console.log("🔐 NextAuth signIn 콜백 호출");
+			console.log("👤 User:", user);
+			console.log("🔑 Account:", account);
+			console.log("📋 Profile:", profile);
+
+			// 구글 로그인인 경우
+			if (account?.provider === "google" && profile) {
+				try {
+					const googleLoginUsecase = new GoogleLoginUsecase(
+						new PrMemberRepository(),
+						new PrMemberRoleRepository()
+					);
+
+					const googleUser = {
+						id: profile.sub as string,
+						email: profile.email as string,
+						name: profile.name as string,
+						picture: profile.picture as string,
+					};
+
+					const result = await googleLoginUsecase.execute(googleUser);
+
+					if (result.success && result.member) {
+						console.log("✅ 구글 로그인 성공:", result.member);
+						// user 객체에 필요한 정보 추가
+						user.id = result.member.id;
+						user.username = result.member.username;
+						user.roles = result.member.roles;
+						return true;
+					}
+
+					console.log("❌ 구글 로그인 실패:", result.message);
+					return false;
+				} catch (error) {
+					console.error("💥 구글 로그인 콜백 오류:", error);
+					return false;
+				}
+			}
+
+			return true;
+		},
 		async jwt({ token, user }: { token: JWT; user?: User }) {
 			if (user) {
 				token.id = user.id;
