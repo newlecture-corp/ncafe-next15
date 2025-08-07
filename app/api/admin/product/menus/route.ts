@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { SbMenuRepository } from "@/backend/infrastructure/repositories/SbMenuRepository";
+import { PrMenuRepository } from "@/backend/infrastructure/repositories/PrMenuRepository";
 import { GetMenuListQueryDto } from "@/backend/application/admin/product/menus/dtos/GetMenuListQueryDto";
 import { NGetMenuListUsecase } from "@/backend/application/admin/product/menus/usecases/NGetMenuListUsecase";
 import { NCreateMenuUsecase } from "@/backend/application/admin/product/menus/usecases/NCreateMenuUsecase";
 import { CreateMenuDto } from "@/backend/application/admin/product/menus/dtos/CreateMenuDto";
-import { SbFileRepository } from "@/backend/infrastructure/repositories/SbFileRepository";
-import { SbMenuImageRepository } from "@/backend/infrastructure/repositories/SbMenuImageRepository";
+import { PrFileRepository } from "@/backend/infrastructure/repositories/PrFileRepository";
+import { PrMenuImageRepository } from "@/backend/infrastructure/repositories/PrMenuImageRepository";
 
 // 관리자를 위한 메뉴 목록 조회 API
 // GET /api/admin/product/menus
@@ -26,13 +24,13 @@ export async function GET(request: NextRequest) {
 		categoryIdParam,
 		searchNameParam,
 		sortFieldParam, // 정렬 기준 필드, 기본값은 "order" 필드
-		ascendingParam === "true" // 정렬 순서, 기본값은 true(오름차순)
+		ascendingParam === "true", // 정렬 순서, 기본값은 true(오름차순)
+		true // includeAll: 관리자 페이지에서는 모든 메뉴를 조회
 	);
 
 	// 3. 쿼리를 위해 전달할 DTO를 Usecase에게 전달해서 실행한다.
 	// Usecase에게 주입할 infrastructure 계층의 Repository 생성
-	const supabase: SupabaseClient = await createClient();
-	const menuRepository = new SbMenuRepository(supabase);
+	const menuRepository = new PrMenuRepository();
 
 	// Usecase에게 의존성을 주입
 	// *** 메뉴 목록 조회하는 업무로직 *** 실행
@@ -89,11 +87,11 @@ export async function POST(request: NextRequest) {
 			defaultImage: defaultImage as File | null,
 		};
 
-		// 1. SupabaseClient 생성 및 Repository DI
-		const supabase = await createClient();
-		const menuRepository = new SbMenuRepository(supabase);
-		const fileRepository = new SbFileRepository(supabase, "image");
-		const menuImageRepository = new SbMenuImageRepository(supabase);
+		// 1. Prisma Repository DI
+		const menuRepository = new PrMenuRepository();
+		const fileRepository = new PrFileRepository();
+		const menuImageRepository = new PrMenuImageRepository();
+
 		// 2. Usecase 생성 및 실행 (FileRepository도 주입)
 		const createMenuUsecase = new NCreateMenuUsecase(
 			menuRepository,

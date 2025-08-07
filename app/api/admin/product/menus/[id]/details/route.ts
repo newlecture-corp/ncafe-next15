@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
-import { SbMenuRepository } from "@/backend/infrastructure/repositories/SbMenuRepository";
+import prisma from "@/utils/prisma";
 
 export async function GET(
 	request: NextRequest,
@@ -8,21 +7,24 @@ export async function GET(
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
-		const supabase = await createClient();
-		const menuRepository = new SbMenuRepository(supabase);
-
 		const resolvedParams = await params;
 		const menuId = parseInt(resolvedParams.id);
 		if (isNaN(menuId)) {
 			return NextResponse.json({ error: "Invalid menu ID" }, { status: 400 });
 		}
 
-		// 2초 지연
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		// 개발용 지연 (필요시 주석 해제)
+		// await new Promise((resolve) => setTimeout(resolve, 3000));
 
-		// 이미지 정보가 포함된 메뉴 데이터 조회
-		const menuWithImage = await menuRepository.findById(menuId, {
-			includeImages: true,
+		// 이미지 정보가 포함된 메뉴 데이터 조회 (삭제되지 않은 메뉴만)
+		const menuWithImage = await prisma.menu.findUnique({
+			where: {
+				id: menuId,
+				deletedAt: null,
+			},
+			include: {
+				images: true,
+			},
 		});
 
 		console.log(menuWithImage);

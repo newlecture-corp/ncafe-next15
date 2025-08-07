@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SbFileRepository } from "../../../backend/infrastructure/repositories/SbFileRepository";
+import { PrFileRepository } from "../../../backend/infrastructure/repositories/PrFileRepository";
 import { UploadFileUsecase } from "../../../backend/application/common/usecases/UploadFileUsecase";
-import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: NextRequest) {
 	try {
@@ -52,8 +51,7 @@ export async function POST(request: NextRequest) {
 		const fileName = `${timestamp}.${extension}`;
 
 		// Usecase 실행
-		const supabase = await createClient();
-		const fileRepository = new SbFileRepository(supabase, "image");
+		const fileRepository = new PrFileRepository();
 		const uploadFileUsecase = new UploadFileUsecase(fileRepository);
 
 		const result = await uploadFileUsecase.execute({
@@ -64,8 +62,7 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({
 			success: true,
-			url: result.url,
-			fileName: fileName,
+			url: result,
 		});
 	} catch (error) {
 		console.error("파일 업로드 오류:", error);
@@ -89,8 +86,7 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		const supabase = await createClient();
-		const fileRepository = new SbFileRepository(supabase, "image");
+		const fileRepository = new PrFileRepository();
 		const files = await fileRepository.findAll(path);
 
 		return NextResponse.json({
