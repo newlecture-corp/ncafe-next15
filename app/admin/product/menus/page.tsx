@@ -11,18 +11,22 @@ export default function MenuListPage() {
 	const [menuData, setMenuData] = useState<GetMenuListDto | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+	const [currentPage, setCurrentPage] = useState(1);
 
 	// 메뉴 목록 데이터 가져오기
-	const fetchMenuList = async () => {
+	const fetchMenuList = async (page: number = 1) => {
 		try {
 			setLoading(true);
-			const response = await fetch("/api/admin/product/menus");
+			const response = await fetch(`/api/admin/product/menus?p=${page}`);
 
 			if (!response.ok) {
 				throw new Error("메뉴 목록을 가져오는데 실패했습니다.");
 			}
 
 			const data: GetMenuListDto = await response.json();
+			console.log("API 응답:", data);
+			console.log("메뉴 개수:", data.menus.length);
 			setMenuData(data);
 		} catch (err) {
 			setError(
@@ -35,8 +39,72 @@ export default function MenuListPage() {
 
 	// 컴포넌트 마운트 시 데이터 가져오기
 	useEffect(() => {
-		fetchMenuList();
-	}, []);
+		fetchMenuList(currentPage);
+	}, [currentPage]);
+
+	// 상세보기 토글 함수
+	const toggleRowDetails = (menuId: number) => {
+		setExpandedRows((prev) => {
+			const newSet = new Set(prev);
+			if (newSet.has(menuId)) {
+				newSet.delete(menuId);
+			} else {
+				newSet.add(menuId);
+			}
+			return newSet;
+		});
+	};
+
+	// 페이지 변경 함수
+	const handlePageChange = (page: number) => {
+		setCurrentPage(page);
+		setExpandedRows(new Set()); // 페이지 변경 시 상세보기 초기화
+	};
+
+	// 페이지네이션 컴포넌트
+	const Pagination = () => {
+		if (!menuData || menuData.endPage <= 1) return null;
+
+		const pages = [];
+		const startPage = Math.max(1, currentPage - 2);
+		const endPage = Math.min(menuData.endPage, currentPage + 2);
+
+		for (let i = startPage; i <= endPage; i++) {
+			pages.push(
+				<button
+					key={i}
+					onClick={() => handlePageChange(i)}
+					className={`n-btn n-btn:rounded ${
+						i === currentPage ? "n-btn-color:main" : "n-btn-color:sub"
+					}`}
+				>
+					{i}
+				</button>
+			);
+		}
+
+		return (
+			<div className="d:flex justify-content:center align-items:center gap:2 mt:5">
+				{currentPage > 1 && (
+					<button
+						onClick={() => handlePageChange(currentPage - 1)}
+						className="n-btn n-btn:rounded n-btn-color:sub"
+					>
+						이전
+					</button>
+				)}
+				{pages}
+				{currentPage < menuData.endPage && (
+					<button
+						onClick={() => handlePageChange(currentPage + 1)}
+						className="n-btn n-btn:rounded n-btn-color:sub"
+					>
+						다음
+					</button>
+				)}
+			</div>
+		);
+	};
 
 	// 로딩 상태
 	if (loading) {
@@ -110,9 +178,10 @@ export default function MenuListPage() {
 								메뉴목록
 							</span>
 						</h1>
-						<div>
-							<span className="ml:1 n-heading:6">
-								({menuData?.menus.length || 0})
+						<div className="d:flex align-items:center">
+							<span>
+								({menuData?.menus.length || 0}) - 페이지 {currentPage} /{" "}
+								{menuData?.endPage || 1}
 							</span>
 						</div>
 					</header>
@@ -127,58 +196,62 @@ export default function MenuListPage() {
 									<th className="w:3">비고</th>
 								</tr>
 							</thead>
-							<tbody>
-								{menuData?.menus.map((menu, index) => (
-									<React.Fragment key={menu.id}>
-										<tr className="vertical-align:middle">
-											<td>{index + 1}</td>
-											<td className="w:0 md:w:2 overflow:hidden">
-												<Image
-													src={
-														menu.defaultImage
-															? `https://stoadsxczvhniitglenu.supabase.co/storage/v1/object/public/image/product/${menu.defaultImage}`
-															: "https://stoadsxczvhniitglenu.supabase.co/storage/v1/object/public/image/product/default.png"
-													}
-													alt={menu.korName}
-													width={50}
-													height={50}
-													unoptimized
-												/>
-											</td>
-											<td className="text-align:start n-heading-truncate">
-												<Link href={`menus/${menu.id}`}>{menu.korName}</Link>
-											</td>
-											<td className="w:0 md:w:2 n-heading-truncate">
-												{menu.engName}
-											</td>
-											<td>
-												<span className="d:inline-flex align-items:center">
-													<label className="n-icon n-icon:arrow_drop_down n-icon-size:2 n-btn mr:2">
-														<input
-															type="checkbox"
-															className="d:none n-row-expander"
-														/>
-														<span>상세보기</span>
-													</label>
-													<Link
-														className="n-icon n-icon:edit_square n-icon-color:base-6"
-														href={`menus/${menu.id}/edit`}
-													>
-														수정
-													</Link>
-													<button className="n-icon n-icon:delete n-icon-color:base-6">
-														삭제
-													</button>
-												</span>
-											</td>
-										</tr>
-										<RowDetails id={menu.id} />
-									</React.Fragment>
-								))}
-							</tbody>
+							{menuData?.menus.map((menu, index) => (
+								<tbody key={menu.id}>
+									<tr className="vertical-align:middle">
+										<td>{(currentPage - 1) * 8 + index + 1}</td>
+										<td className="w:0 md:w:2 overflow:hidden">
+											<Image
+												src={
+													menu.defaultImage
+														? `/image/product/${menu.defaultImage}`
+														: "/image/product/default.png"
+												}
+												alt={menu.korName}
+												width={50}
+												height={50}
+												unoptimized
+											/>
+										</td>
+										<td className="text-align:start n-heading-truncate">
+											<Link href={`menus/${menu.id}`}>{menu.korName}</Link>
+										</td>
+										<td className="w:0 md:w:2 n-heading-truncate">
+											{menu.engName}
+										</td>
+										<td>
+											<span className="d:inline-flex align-items:center">
+												<label className="n-icon n-icon:arrow_drop_down n-icon-size:2 n-btn mr:2">
+													<input
+														type="checkbox"
+														className="d:none n-row-expander"
+														checked={expandedRows.has(menu.id!)}
+														onChange={() => toggleRowDetails(menu.id!)}
+													/>
+													<span>상세보기</span>
+												</label>
+												<Link
+													className="n-icon n-icon:edit_square n-icon-color:base-6"
+													href={`menus/${menu.id}/edit`}
+												>
+													수정
+												</Link>
+												<button className="n-icon n-icon:delete n-icon-color:base-6">
+													삭제
+												</button>
+											</span>
+										</td>
+									</tr>
+									{expandedRows.has(menu.id!) && (
+										<RowDetails id={menu.id!} isVisible={true} />
+									)}
+								</tbody>
+							))}
 						</table>
 					</div>
 				</section>
+
+				<Pagination />
 			</section>
 		</main>
 	);

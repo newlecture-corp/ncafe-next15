@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
-import { SbMenuImageRepository } from "@/backend/infrastructure/repositories/SbMenuImageRepository";
+import { PrMenuImageRepository } from "@/backend/infrastructure/repositories/PrMenuImageRepository";
 import { NGetMenuImageListUsecase } from "@/backend/application/admin/product/menu-images/usecases/NGetMenuImageListUsecase";
 import { GetMenuImageListQueryDto } from "@/backend/application/admin/product/menu-images/dtos/GetMenuImageListQueryDto";
 
 export async function GET(request: NextRequest) {
 	try {
-		const supabase = await createClient();
-		const menuImageRepository = new SbMenuImageRepository(supabase);
+		const menuImageRepository = new PrMenuImageRepository();
 		const getMenuImageListUsecase = new NGetMenuImageListUsecase(
 			menuImageRepository
 		);

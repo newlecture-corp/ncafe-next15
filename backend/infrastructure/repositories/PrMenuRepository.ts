@@ -1,6 +1,5 @@
 import { Menu } from "@/backend/domain/entities/Menu";
 import { MenuRepository } from "../../domain/repositories/MenuRepository";
-// import { Menu } from "../../domain/entities/Menu";
 import { MenuSearchCriteria } from "../../domain/repositories/criteria/MenuSearchCriteria";
 import { MenuRelationsOptions } from "../../domain/repositories/options/MenuRelationsOptions";
 import prisma from "@/utils/prisma";
@@ -20,24 +19,45 @@ export class PrMenuRepository implements MenuRepository {
 			];
 		}
 
-		// 카테고리 ID (필요시 추가)
+		// 카테고리 ID
 		if (criteria.categoryId) {
-			where.categoryId = criteria.categoryId; // TODO: 실제 필드명 확인 필요
+			where.categoryId = criteria.categoryId;
 		}
 
-		// 멤버 ID (필요시 추가)
+		// 멤버 ID
 		if (criteria.memberId) {
-			where.memberId = criteria.memberId; // TODO: 실제 필드명 확인 필요
+			where.memberId = criteria.memberId;
 		}
 
 		// 공개 여부 (isPublic)
 		if (criteria.publicOnly) {
-			// where.isPublic = true; // TODO: 실제 필드명 확인 필요
+			where.isPublic = true;
 		}
 
-		// 정렬
+		// 삭제되지 않은 메뉴만 조회 (소프트 삭제)
+		where.deletedAt = null;
+
+		// 정렬 필드 매핑
+		const getSortField = (field: string): string => {
+			switch (field) {
+				case "createdAt":
+					return "createdAt";
+				case "updatedAt":
+					return "updatedAt";
+				case "korName":
+					return "korName";
+				case "engName":
+					return "engName";
+				case "price":
+					return "price";
+				default:
+					return "createdAt";
+			}
+		};
+
+		const sortField = getSortField(criteria.sortField || "createdAt");
 		const orderBy: Record<string, "asc" | "desc"> = {};
-		orderBy[criteria.sortField] = criteria.ascending ? "asc" : "desc";
+		orderBy[sortField] = criteria.ascending ? "asc" : "desc";
 
 		// relations
 		const include: Record<string, boolean> = {};
@@ -51,9 +71,6 @@ export class PrMenuRepository implements MenuRepository {
 			skip: criteria.offset,
 			take: criteria.limit,
 			include,
-			//   include: {
-			//     MenuImage: true,
-			//   },
 		});
 
 		return menus as Menu[];
@@ -67,6 +84,7 @@ export class PrMenuRepository implements MenuRepository {
 		if (relations?.includeImages) include.images = true;
 		if (relations?.includeMember) include.member = true;
 		if (relations?.includeLikes) include.likes = true;
+
 		const menu = await prisma.menu.findUnique({
 			where: { id },
 			include,
@@ -76,9 +94,10 @@ export class PrMenuRepository implements MenuRepository {
 
 	async count(criteria: MenuSearchCriteria): Promise<number> {
 		const where: Record<string, unknown> = {};
+
 		if (criteria.searchWord) {
 			where.OR = [
-				{ korName: { contains: criteria.searchWord, mode: "insensitive" } },
+				{ korName: { contains: criteria.searchWord } },
 				{ engName: { contains: criteria.searchWord, mode: "insensitive" } },
 			];
 		}
@@ -91,6 +110,10 @@ export class PrMenuRepository implements MenuRepository {
 		if (criteria.publicOnly) {
 			where.isPublic = true;
 		}
+
+		// 삭제되지 않은 메뉴만 조회 (소프트 삭제)
+		where.deletedAt = null;
+
 		return await prisma.menu.count({ where });
 	}
 
@@ -100,36 +123,43 @@ export class PrMenuRepository implements MenuRepository {
 				korName: menu.korName!,
 				engName: menu.engName!,
 				price: menu.price!,
-				description: menu.description,
-				memberId: menu.memberId!,
-				categoryId: menu.categoryId!,
+				isPublic: menu.isPublic ?? false,
 				hasIce: menu.hasIce ?? true,
 				hasHot: menu.hasHot ?? true,
-				isPublic: menu.isPublic ?? false,
+				description: menu.description,
+				categoryId: menu.categoryId!,
+				memberId: menu.memberId!,
 			},
 		});
 		return created as Menu;
 	}
 
 	async update(menu: Menu): Promise<Menu> {
+		if (!menu.id) {
+			throw new Error("메뉴 ID가 필요합니다.");
+		}
+
 		const updated = await prisma.menu.update({
-			where: { id: menu.id! },
+			where: { id: menu.id },
 			data: {
-				korName: menu.korName!,
-				engName: menu.engName!,
-				price: menu.price!,
+				korName: menu.korName,
+				engName: menu.engName,
+				price: menu.price,
+				isPublic: menu.isPublic,
+				hasIce: menu.hasIce,
+				hasHot: menu.hasHot,
 				description: menu.description,
-				memberId: menu.memberId!,
-				categoryId: menu.categoryId!,
-				hasIce: menu.hasIce ?? true,
-				hasHot: menu.hasHot ?? true,
-				isPublic: menu.isPublic ?? false,
+				categoryId: menu.categoryId,
+				memberId: menu.memberId,
+				updatedAt: new Date(),
 			},
 		});
 		return updated as Menu;
 	}
 
 	async delete(id: number): Promise<void> {
-		await prisma.menu.delete({ where: { id } });
+		await prisma.menu.delete({
+			where: { id },
+		});
 	}
 }

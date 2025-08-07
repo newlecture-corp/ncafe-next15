@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
-import { SbMenuRepository } from "@/backend/infrastructure/repositories/SbMenuRepository";
+import { PrMenuRepository } from "@/backend/infrastructure/repositories/PrMenuRepository";
 import { NDeleteMenuUsecase } from "@/backend/application/admin/product/menus/usecases/NDeleteMenuUsecase";
 
 export async function GET(
@@ -8,8 +7,7 @@ export async function GET(
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
-		const supabase = await createClient();
-		const menuRepository = new SbMenuRepository(supabase);
+		const menuRepository = new PrMenuRepository();
 
 		const resolvedParams = await params;
 		const menuId = parseInt(resolvedParams.id);
@@ -45,8 +43,7 @@ export async function DELETE(
 		}
 
 		// 2. 메뉴 삭제 유스케이스 위한 의존성 주입
-		const supabase = await createClient();
-		const menuRepository = new SbMenuRepository(supabase);
+		const menuRepository = new PrMenuRepository();
 		const deleteMenuUsecase = new NDeleteMenuUsecase(menuRepository);
 
 		// 3. 메뉴 삭제 실행

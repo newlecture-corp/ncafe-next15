@@ -32,8 +32,7 @@ export class NCreateMenuUsecase {
 		saveMenu.description = menuDto.description ?? null;
 
 		// defaultImage가 파일로 들어오면 파일 정보 로그 출력 및 파일 저장
-		let defaultImageUrl: string | undefined = undefined;
-		const bucket = "image";
+		let defaultImageFileName: string | undefined = undefined;
 		const folder = "product";
 		if (menuDto.defaultImage && typeof menuDto.defaultImage !== "string") {
 			const file = menuDto.defaultImage;
@@ -53,7 +52,7 @@ export class NCreateMenuUsecase {
 			await this.fileRepository.save(folder, fileName, file, {
 				onDuplicate: "serial",
 			});
-			defaultImageUrl = `/${bucket}/${folder}/${fileName}`;
+			defaultImageFileName = fileName; // 파일명만 저장
 		}
 
 		// 필요시 옵션 필드 추가 대입
@@ -62,7 +61,7 @@ export class NCreateMenuUsecase {
 		const saveImage = new MenuImage();
 		saveImage.id = undefined;
 		saveImage.menuId = savedMenu.id ?? 0;
-		saveImage.name = defaultImageUrl ?? "";
+		saveImage.name = defaultImageFileName ?? ""; // 파일명만 저장
 		saveImage.isDefault = true;
 		const savedImage = await this.menuImageRepository.save(saveImage);
 
@@ -73,7 +72,7 @@ export class NCreateMenuUsecase {
 			engName: savedMenu.engName ?? "",
 			price: String(savedMenu.price),
 			description: savedMenu.description ?? "",
-			defaultImage: savedImage.name ?? "",
+			defaultImage: savedImage.name ?? "", // 파일명만 반환
 			createdAt: savedMenu.createdAt?.toISOString() ?? "",
 			updatedAt: savedMenu.updatedAt?.toISOString() ?? "",
 		};
