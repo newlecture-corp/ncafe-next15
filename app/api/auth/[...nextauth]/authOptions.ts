@@ -42,8 +42,8 @@ export const authOptions = {
 
 				try {
 					const loginUsecase = new LoginUsecase(new PrMemberRepository());
-					const request = new LoginRequestDto(username, password);
-					const result = await loginUsecase.execute(request);
+					const loginRequestdto = new LoginRequestDto(username, password);
+					const result = await loginUsecase.execute(loginRequestdto);
 
 					console.log("📋 LoginUsecase 결과:", JSON.stringify(result, null, 2));
 
