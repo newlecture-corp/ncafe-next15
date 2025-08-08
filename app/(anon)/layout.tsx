@@ -12,7 +12,7 @@ export default async function AnonLayout({
 	const session = await getServerSession(authOptions);
 
 	return (
-		<div>
+		<div className="d:flex flex-direction:column h:100p">
 			<NextAuthSessionProvider session={session}>
 				<RootHeader />
 				{children}
